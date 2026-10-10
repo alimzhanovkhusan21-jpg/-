@@ -255,12 +255,13 @@
 
         <button class="tg-copy-btn" onclick="copyForTelegram()">
             📋 Скопировать всё для Telegram
-                <script>
+                 <script>
         let formStatus = null;
         let activeFilter = 'all';
+        let secretClickCount = 0; // Счетчик тайных кликов
         
         const allPvzList = [
-            "FrТАШ-160","FrТАШ-166","FrТАШ-167","FrТАШ-169","FrТАШ-171","FrТАШ-175","FrТАШ-176","FrТАШ-179","FrТАШ-181","FrТАШ-184","FrТАШ-185","FrТАШ-187","FrТАШ-188","FrТАШ-189","FrТАШ-192","FrТАШ-195","FrТАШ-196","FrТАШ-198","FrТАШ-200","FrТАШ-203","FrТАШ-205","FrТАШ-206","FrТАШ-208","FrТАШ-213","FrТАШ-215","FrТАШ-219","FrТАШ-220","FrТАШ-225","FrТАШ-227","FrТАШ-230","FrТАШ-232","FrТАШ-237","FrТАШ-239","FrТАШ-243","FrТАШ-247","FrТАШ-250","FrТАШ-251","FrТАШ-258","FrТАШ-261","FrТАШ-265","FrТАШ-266","FrТАШ-269","FrТАШ-271","FrТАШ-275","FrТАШ-277","FrТАШ-282","FrТАШ-283","FrТАШ-284","FrТАШ-285","FrТАШ-286","FrТАШ-287","FrТАШ-292","FrТАШ-293","FrТАШ-296","FrТАШ-297","FrТАШ-298","FrТАШ-304","FrТАШ-309","FrТАШ-310","FrТАШ-317","FrТАШ-318","FrТАШ-321","FrТАШ-322","FrТАШ-323","FrТАШ-325","FrТАШ-330","FrТАШ-331","FrТАШ-332","FrТАШ-333","FrТАШ-335","FrТАШ-336","FrТАШ-337","FrТАШ-338","FrТАШ-339","FrТАШ-341","FrТАШ-342","FrТАШ-347","FrТАШ-352","FrТАШ-353","FrТАШ-355","FrТАШ-365","FrТАШ-369","FrТАШ-370","FrТАШ-373","FrТАШ-376","FrТАШ-378","FrТАШ-379","FrТАШ-389","FrТАШ-393","FrТАШ-395","FrТАШ-397","FrТАШ-398","FrТАШ-401","FrТАШ-406","FrТАШ-407","FrТАШ-409","FrТАШ-411","FrТАШ-412","FrТАШ-414","FrТАШ-415","FrТАШ-417","FrТАШ-418","FrТАШ-419","FrТАШ-428","FrТАШ-429","FrТАШ-439","FrЧИН-9"
+            "FrТАШ-160","FrТАШ-166","FrТАШ-167","FrТАШ-169","FrТАШ-171","FrТАШ-175","FrТАШ-176","FrТАШ-179","FrТАШ-181","FrТАШ-184","FrТАШ-185","FrТАШ-187","FrТАШ-188","FrТАШ-189","FrТАШ-192","FrТАШ-195","FrТАШ-196","FrТАШ-198","FrТАШ-200","FrТАШ-203","FrТАШ-205","FrТАШ-206","FrТАШ-208","FrТАШ-213","FrТАШ-215","FrТАШ-219","FrТАШ-220","FrТАШ-225","FrТАШ-227","FrТАШ-230","FrТАШ-232","FrТАШ-237","FrТАШ-239","FrТАШ-243","FrТАШ-247","FrТАШ-250","FrТАШ-251","FrТАШ-258","FrТАШ-258","FrТАШ-261","FrТАШ-265","FrТАШ-266","FrТАШ-269","FrТАШ-271","FrТАШ-275","FrТАШ-277","FrТАШ-282","FrТАШ-283","FrТАШ-284","FrТАШ-285","FrТАШ-286","FrТАШ-287","FrТАШ-292","FrТАШ-293","FrТАШ-296","FrТАШ-297","FrТАШ-298","FrТАШ-304","FrТАШ-309","FrТАШ-310","FrТАШ-317","FrТАШ-318","FrТАШ-321","FrТАШ-322","FrТАШ-323","FrТАШ-325","FrТАШ-330","FrТАШ-331","FrТАШ-332","FrТАШ-333","FrТАШ-335","FrТАШ-336","FrТАШ-337","FrТАШ-338","FrТАШ-339","FrТАШ-341","FrТАШ-342","FrТАШ-347","FrТАШ-352","FrТАШ-353","FrТАШ-355","FrТАШ-365","FrТАШ-369","FrТАШ-370","FrТАШ-373","FrТАШ-376","FrТАШ-378","FrТАШ-379","FrТАШ-389","FrТАШ-393","FrТАШ-395","FrТАШ-397","FrТАШ-398","FrТАШ-401","FrТАШ-406","FrТАШ-407","FrТАШ-409","FrТАШ-411","FrТАШ-412","FrТАШ-414","FrТАШ-415","FrТАШ-417","FrТАШ-418","FrТАШ-419","FrТАШ-428","FrТАШ-429","FrТАШ-439","FrЧИН-9"
         ];
 
         let localSubmitted = {};
@@ -268,8 +269,30 @@
         window.onload = function() {
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('reportDate').value = today;
+            
+            // Подключаем тайный вызов к полю даты
+            document.getElementById('reportDate').addEventListener('click', function() {
+                secretClickCount++;
+                if (secretClickCount === 5) {
+                    secretReset();
+                    secretClickCount = 0;
+                }
+                // Сброс счетчика через 3 секунды, если не успели докликать
+                setTimeout(() => { secretClickCount = 0; }, 3000);
+            });
+
             renderDebtors();
         };
+
+        // Функция секретного обнуления
+        function secretReset() {
+            const selectedDate = document.getElementById('reportDate').value;
+            if (confirm("Вы действительно хотите сбросить все ПВЗ за дату " + selectedDate + "?")) {
+                localSubmitted[selectedDate] = [];
+                renderDebtors();
+                alert("Все ПВЗ успешно сброшены!");
+            }
+        }
 
         function setFormStatus(status) {
             formStatus = status;
@@ -394,17 +417,10 @@
 
             var dummy = document.createElement("textarea");
             document.body.appendChild(dummy);
-            dummy.value = text;
-            dummy.select();
-            document.execCommand("copy");
+            dummy.value = text; dummy.select(); document.execCommand("copy");
             document.body.removeChild(dummy);
             alert("Список скопирован для Telegram!");
         }
     </script>
 </body>
 </html>
-
-        </button>
-    </div>
-
-
