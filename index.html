@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uzum Инкассация & Калькулятор</title>
+    <style>
+        :root {
+            --uzum-purple: #7C3AED;
+            --uzum-dark: #1F2937;
+            --uzum-bg: #F3F4F6;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--uzum-bg);
+            color: var(--uzum-dark);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 480px;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: var(--uzum-purple);
+            margin-top: 0;
+            text-align: center;
+            border-bottom: 2px solid var(--uzum-bg);
+            padding-bottom: 10px;
+        }
+        label {
+            display: block;
+            margin: 15px 0 5px;
+            font-weight: 600;
+        }
+        select, input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #E5E7EB;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+            outline: none;
+            transition: 0.2s;
+        }
+        select:focus, input:focus, textarea:focus {
+            border-color: var(--uzum-purple);
+        }
+        .status-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .status-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #E5E7EB;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: 0.2s;
+        }
+        .status-btn.active-yes {
+            background: #10B981;
+            color: white;
+            border-color: #10B981;
+        }
+        .status-btn.active-no {
+            background: #EF4444;
+            color: white;
+            border-color: #EF4444;
+        }
+        .denom-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            background: var(--uzum-bg);
+            padding: 8px 12px;
+            border-radius: 8px;
+        }
+        .denom-label {
+            font-weight: bold;
+            width: 100px;
+        }
+        .denom-input {
+            width: 80px;
+            padding: 6px;
+            text-align: center;
+        }
+        .denom-sum {
+            width: 140px;
+            text-align: right;
+            font-size: 14px;
+            color: #6B7280;
+        }
+        .total-box {
+            background: #EDF2F7;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 15px;
+            color: var(--uzum-purple);
+        }
+        .submit-btn, .reset-btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: 0.2s;
+        }
+        .submit-btn {
+            background: var(--uzum-purple);
+            color: white;
+        }
+        .submit-btn:hover {
+            background: #6D28D9;
+        }
+        .reset-btn {
+            background: #E5E7EB;
+            color: #374151;
+        }
+        .reset-btn:hover {
+            background: #D1D5DB;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- БЛОК 1: ИНКАССАЦИЯ ПВЗ -->
+    <div class="container">
+        <h2>Инкассация ПВЗ</h2>
+        
+        <label for="pvzSelect">Выберите ПВЗ:</label>
+        <select id="pvzSelect">
+            <option value="">-- Выберите ПВЗ --</option>
+            <option value="FrТАШ-157">FrТАШ-157</option>
+            <option value="FrТАШ-160">FrТАШ-160</option>
+            <option value="FrТАШ-163">FrТАШ-163</option>
+            <option value="FrТАШ-164">FrТАШ-164</option>
+            <option value="FrТАШ-171">FrТАШ-171</option>
+            <option value="FrТАШ-178">FrТАШ-178</option>
+            <option value="FrТАШ-180">FrТАШ-180</option>
+            <option value="FrТАШ-181">FrТАШ-181</option>
+            <option value="FrТАШ-182">FrТАШ-182</option>
+            <option value="FrТАШ-184">FrТАШ-184</option>
+            <option value="FrТАШ-186">FrТАШ-186</option>
+            <option value="FrТАШ-187">FrТАШ-187</option>
+            <option value="FrТАШ-188">FrТАШ-188</option>
+            <option value="FrТАШ-192">FrТАШ-192</option>
+            <option value="FrТАШ-193">FrТАШ-193</option>
+            <option value="FrТАШ-194">FrТАШ-194</option>
+        </select>
+
+        <label>Статус инкассации:</label>
+        <div class="status-group">
+            <button type="button" class="status-btn" id="btnYes" onclick="setStatus(true)">Сдано ✅</button>
+            <button type="button" class="status-btn" id="btnNo" onclick="setStatus(false)">Не сдано ❌</button>
+        </div>
+
+        <label for="comment">Причина / Комментарий:</label>
+        <textarea id="comment" rows="3" placeholder="Укажите причину, если ПВЗ не сдал кассу..."></textarea>
+    </div>
+
+    <!-- БЛОК 2: КАЛЬКУЛЯТОР КУПЮР -->
+    <div class="container">
+        <h2>Калькулятор купюр (UZS)</h2>
+        <div id="calculator"></div>
+        <div class="total-box" id="grandTotal">ИТОГО: 0 сум</div>
+        
+        <button class="submit-btn" onclick="sendData()">Сохранить данные в таблицу</button>
+        <button class="reset-btn" onclick="resetAll()">Очистить всё</button>
+    </div>
+
+    <script>
+        let isCollected = null;
+        const denominations =;
+        
+        // Генерация полей калькулятора
+        const calContainer = document.getElementById('calculator');
+        denominations.forEach(denom => {
+            const row = document.createElement('div');
+            row.className = 'denom-row';
+            row.innerHTML = `
+                <div class="denom-label">${denom.toLocaleString()} сум</div>
+                <input type="number" class="denom-input" id="input-${denom}" min="0" placeholder="0" oninput="calculateTotal()">
+                <div class="denom-sum" id="sum-${denom}">0 сум</div>
+            `;
+            calContainer.appendChild(row);
+        });
+
+        function setStatus(status) {
+            isCollected = status;
+            const btnYes = document.getElementById('btnYes');
+            const btnNo = document.getElementById('btnNo');
+            
+            if(status) {
+                btnYes.classList.add('active-yes');
+                btnNo.classList.remove('active-no');
+            } else {
+                btnNo.classList.add('active-no');
+                btnYes.classList.remove('active-yes');
+            }
+        }
+
+        function calculateTotal() {
+            let grandTotal = 0;
+            denominations.forEach(denom => {
+                const count = parseInt(document.getElementById(`input-${denom}`).value) || 0;
+                const rowSum = count * denom;
+                grandTotal += rowSum;
+                document.getElementById(`sum-${denom}`).innerText = rowSum.toLocaleString() + ' сум';
+            });
+            document.getElementById('grandTotal').innerText = 'ИТОГО: ' + grandTotal.toLocaleString() + ' сум';
+        }
+
+        function resetAll() {
+            document.getElementById('pvzSelect').value = "";
+            document.getElementById('comment').value = "";
+            isCollected = null;
+            document.getElementById('btnYes').classList.remove('active-yes');
+            document.getElementById('btnNo').classList.remove('active-no');
+            
+            denominations.forEach(denom => {
+                document.getElementById(`input-${denom}`).value = "";
+            });
+            calculateTotal();
+        }
+
+        function sendData() {
+            const pvz = document.getElementById('pvzSelect').value;
+            const comment = document.getElementById('comment').value;
+            
+            if(!pvz) {
+                alert("Пожалуйста, выберите ПВЗ перед отправкой!");
+                return;
+            }
+            if(isCollected === null) {
+                alert("Пожалуйста, выберите статус инкассации!");
+                return;
+            }
+
+            let grandTotal = 0;
+            denominations.forEach(denom => {
+                const count = parseInt(document.getElementById(`input-${denom}`).value) || 0;
+                grandTotal += count * denom;
+            });
+
+            // Тот самый рабочий мост к вашей таблице
+            const webAppUrl = "https://google.com";
+
+            const payload = {
+                pvz: pvz,
+                status: isCollected,
+                comment: comment,
+                totalSum: grandTotal
+            };
+
+            fetch(webAppUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                cache: 'no-cache',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(() => {
+                alert("Данные успешно отправлены в Google Таблицу!");
+                resetAll();
+            })
+            .catch(error => {
+                alert("Ошибка при отправке данных: " + error);
+            });
+        }
+    </script>
+</body>
+</html>
