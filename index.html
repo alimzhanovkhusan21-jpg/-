@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Uzum Инкассация & Отчеты</title>
-           <link rel="icon" type="image/jpeg" href="logo.jpg">
+    <link rel="icon" type="image/jpeg" href="logo.jpg">
     <style>
         :root {
             --uzum-purple: #7C3AED;
@@ -191,7 +191,7 @@
             font-size: 12px;
             font-weight: 600;
         }
-        .grid-button, .tg-copy-btn {
+        .tg-copy-btn {
             width: 100%;
             padding: 14px;
             background: rgba(255,255,255,0.05);
@@ -211,10 +211,9 @@
 <body>
     <!-- КАРТОЧКА ВВОДА ДАННЫХ -->
     <div class="container">
-      <div style="text-align: center; margin-bottom: 20px;">
-    <img src="logo.jpg" style="width: 90px; height: 90px; border-radius: 20px; box-shadow: 0 5px 20px rgba(124, 58, 237, 0.4); object-fit: cover;">
-</div>
-
+        <div style="text-align: center; margin-bottom: 20px;">
+            <img src="logo.jpg" style="width: 90px; height: 90px; border-radius: 20px; box-shadow: 0 5px 20px rgba(124, 58, 237, 0.4); object-fit: cover;">
+        </div>
         <h2>Инкассация ПВЗ</h2>
         
         <label for="pvzSelect">Выберите ПВЗ:</label>
@@ -237,7 +236,6 @@
 
     <div class="container">
         <h3>📊 Мониторинг инкассации</h3>
-
         
         <label>Выбор даты отчёта:</label>
         <input type="date" id="reportDate" onchange="loadReport()">
@@ -260,7 +258,9 @@
 
         <button class="tg-copy-btn" onclick="copyForTelegram()">
             📋 Скопировать всё для Telegram
-                   <script>
+        </button>
+    </div>
+    <script>
         let formStatus = null;
         let activeFilter = 'all';
         let secretClickCount = 0;
@@ -270,9 +270,10 @@
         ];
 
         let localSubmitted = JSON.parse(localStorage.getItem('uzum_inkas_data')) || {};
+        let localComments = JSON.parse(localStorage.getItem('uzum_inkas_comments')) || {};
 
         window.onload = function() {
-            const today = new Date().toISOString().split('T');
+            const today = new Date().toISOString().split('T')[0];
             document.getElementById('reportDate').value = today;
             
             const titleH3 = document.querySelector('h3');
@@ -311,7 +312,7 @@
                 todayBtn.classList.add('active-date');
                 yesterdayBtn.classList.remove('active-date');
             }
-            dateInput.value = targetDate.toISOString().split('T');
+            dateInput.value = targetDate.toISOString().split('T')[0];
             renderDebtors();
         }
 
@@ -351,16 +352,25 @@
             displayedPvz.forEach(pvz => {
                 const tag = document.createElement('div');
                 tag.className = 'pvz-tag';
+                
                 if(submittedOnDate.includes(pvz)) {
-                    tag.style.background = '#112F24';
-                    tag.style.borderColor = 'rgba(16, 185, 129, 0.3)';
-                    tag.style.color = '#A7F3D0';
+                    const savedComments = localComments[selectedDate] || {};
+                    const isPvzCollected = savedComments[pvz] ? savedComments[pvz].status : true;
+                    
+                    if (isPvzCollected) {
+                        tag.style.background = '#112F24';
+                        tag.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+                        tag.style.color = '#A7F3D0';
+                    } else {
+                        tag.style.background = '#3B141A';
+                        tag.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+                        tag.style.color = '#FCA5A5';
+                    }
                 }
                 tag.innerText = pvz;
                 container.appendChild(tag);
             });
         }
-
         function resetAll() {
             document.getElementById('pvzSelect').value = "";
             document.getElementById('comment').value = "";
@@ -376,6 +386,7 @@
             
             if(!pvz) { alert("Выберите ПВЗ!"); return; }
             if(formStatus === null) { alert("Выберите статус!"); return; }
+            if(formStatus === false && !comment.trim()) { alert("Пожалуйста, обязательно укажите причину не сдачи!"); return; }
 
             const webAppUrl = "https://google.com";
             const payload = { pvz: pvz, status: formStatus, comment: comment, totalSum: 0 };
@@ -390,11 +401,13 @@
             .then(() => {
                 alert("Данные успешно отправлены в Google Таблицу!");
                 
-                if(formStatus === true) {
-                    if(!localSubmitted[selectedDate]) localSubmitted[selectedDate] = [];
-                    if(!localSubmitted[selectedDate].includes(pvz)) localSubmitted[selectedDate].push(pvz);
-                    localStorage.setItem('uzum_inkas_data', JSON.stringify(localSubmitted));
-                }
+                if(!localSubmitted[selectedDate]) localSubmitted[selectedDate] = [];
+                if(!localSubmitted[selectedDate].includes(pvz)) localSubmitted[selectedDate].push(pvz);
+                localStorage.setItem('uzum_inkas_data', JSON.stringify(localSubmitted));
+
+                if(!localComments[selectedDate]) localComments[selectedDate] = {};
+                localComments[selectedDate][pvz] = { status: formStatus, text: comment };
+                localStorage.setItem('uzum_inkas_comments', JSON.stringify(localComments));
                 
                 renderDebtors();
                 resetAll();
@@ -416,7 +429,9 @@
                     .then(() => {
                         const selectedDate = document.getElementById('reportDate').value;
                         localSubmitted[selectedDate] = [];
+                        localComments[selectedDate] = {};
                         localStorage.setItem('uzum_inkas_data', JSON.stringify(localSubmitted));
+                        localStorage.setItem('uzum_inkas_comments', JSON.stringify(localComments));
                         renderDebtors();
                         alert("Система успешно обнулена!");
                     });
@@ -426,40 +441,47 @@
             }
         }
 
-        // ОБНОВЛЕННАЯ ФУНКЦИЯ: КОПИРУЕТ И ТЕХ КТО СДАЛ, И ТЕХ КТО НЕ СДАЛ
         function copyForTelegram() {
             const selectedDate = document.getElementById('reportDate').value;
             const submittedOnDate = localSubmitted[selectedDate] || [];
-            const debtors = allPvzList.filter(p => !submittedOnDate.includes(p));
+            const savedComments = localComments[selectedDate] || {};
+
+            let listSдали = [];
+            let listNeСдалиСПричиной = [];
+            let listВообщеНеОтметились = [];
+
+            submittedOnDate.forEach(pvz => {
+                const info = savedComments[pvz];
+                if (info && info.status === false) {
+                    listNeСдалиСПричиной.push(`• ${pvz} (Причина: ${info.text || 'не указана'})`);
+                } else {
+                    listSдали.push(pvz);
+                }
+            });
+
+            allPvzList.forEach(pvz => {
+                if (!submittedOnDate.includes(pvz)) {
+                    listВообщеНеОтметились.push(pvz);
+                }
+            });
 
             let text = `📊 *ОТЧЕТ ПО ИНКАССАЦИИ ЗА ${selectedDate}*\n\n`;
 
-            // 1. Блок сдавших
-            text += `✅ *Сдали инкассацию (${submittedOnDate.length}):*\n`;
-            if (submittedOnDate.length > 0) {
-                text += submittedOnDate.join(', ') + '\n\n';
-            } else {
-                text += 'Пока никто не сдал\n\n';
-            }
+            text += `✅ *Сдали инкассацию (${listSдали.length}):*\n`;
+            text += (listSдали.length > 0 ? listSдали.join(', ') : 'Пока никто не сдал') + '\n\n';
 
-            // 2. Блок не сдавших
-            text += `🔴 *Не сдали инкассацию (${debtors.length}):*\n`;
-            if (debtors.length > 0) {
-                text += debtors.join(', ') + '\n';
-            } else {
-                text += 'Все ПВЗ успешно сдали! 🎉\n';
-            }
+            text += `⚠️ *Не сдали инкассацию с указанием причины (${listNeСдалиСПричиной.length}):*\n`;
+            text += (listNeСдалиСПричиной.length > 0 ? listNeСдалиСПричиной.join('\n') : 'Таких ПВЗ нет') + '\n\n';
+
+            text += `🔴 *Вообще не внесли данные на сайт (${listВообщеНеОтметились.length}):*\n`;
+            text += (listВообщеНеОтметились.length > 0 ? listВообщеНеОтметились.join(', ') : 'Все ПВЗ заполнили отчет! 🎉') + '\n';
 
             var dummy = document.createElement("textarea");
             document.body.appendChild(dummy);
-            dummy.value = text; 
-            dummy.select(); 
-            document.execCommand("copy");
+            dummy.value = text; dummy.select(); document.execCommand("copy");
             document.body.removeChild(dummy);
-            alert("Полный отчет (Сдали + Не сдали) скопирован в буфер обмена!");
+            alert("Раздельный отчет с причинами не сдачи успешно скопирован!");
         }
     </script>
 </body>
 </html>
-
-
