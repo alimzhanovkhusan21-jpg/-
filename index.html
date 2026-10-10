@@ -255,10 +255,10 @@
 
         <button class="tg-copy-btn" onclick="copyForTelegram()">
             📋 Скопировать всё для Telegram
-                  <script>
+                   <script>
         let formStatus = null;
         let activeFilter = 'all';
-        let secretClickCount = 0; // Счетчик для заголовка
+        let secretClickCount = 0;
         
         const allPvzList = [
             "FrТАШ-160","FrТАШ-166","FrТАШ-167","FrТАШ-169","FrТАШ-171","FrТАШ-175","FrТАШ-176","FrТАШ-179","FrТАШ-181","FrТАШ-184","FrТАШ-185","FrТАШ-187","FrТАШ-188","FrТАШ-189","FrТАШ-192","FrТАШ-195","FrТАШ-196","FrТАШ-198","FrТАШ-200","FrТАШ-203","FrТАШ-205","FrТАШ-206","FrТАШ-208","FrТАШ-213","FrТАШ-215","FrТАШ-219","FrТАШ-220","FrТАШ-225","FrТАШ-227","FrТАШ-230","FrТАШ-232","FrТАШ-237","FrТАШ-239","FrТАШ-243","FrТАШ-247","FrТАШ-250","FrТАШ-251","FrТАШ-258","FrТАШ-261","FrТАШ-265","FrТАШ-266","FrТАШ-269","FrТАШ-271","FrТАШ-275","FrТАШ-277","FrТАШ-282","FrТАШ-283","FrТАШ-284","FrТАШ-285","FrТАШ-286","FrТАШ-287","FrТАШ-292","FrТАШ-293","FrТАШ-296","FrТАШ-297","FrТАШ-298","FrТАШ-304","FrТАШ-309","FrТАШ-310","FrТАШ-317","FrТАШ-318","FrТАШ-321","FrТАШ-322","FrТАШ-323","FrТАШ-325","FrТАШ-330","FrТАШ-331","FrТАШ-332","FrТАШ-333","FrТАШ-335","FrТАШ-336","FrТАШ-337","FrТАШ-338","FrТАШ-339","FrТАШ-341","FrТАШ-342","FrТАШ-347","FrТАШ-352","FrТАШ-353","FrТАШ-355","FrТАШ-365","FrТАШ-369","FrТАШ-370","FrТАШ-373","FrТАШ-376","FrТАШ-378","FrТАШ-379","FrТАШ-389","FrТАШ-393","FrТАШ-395","FrТАШ-397","FrТАШ-398","FrТАШ-401","FrТАШ-406","FrТАШ-407","FrТАШ-409","FrТАШ-411","FrТАШ-412","FrТАШ-414","FrТАШ-415","FrТАШ-417","FrТАШ-418","FrТАШ-419","FrТАШ-428","FrТАШ-429","FrТАШ-439","FrЧИН-9"
@@ -267,10 +267,9 @@
         let localSubmitted = JSON.parse(localStorage.getItem('uzum_inkas_data')) || {};
 
         window.onload = function() {
-            const today = new Date().toISOString().split('T')[0];
+            const today = new Date().toISOString().split('T');
             document.getElementById('reportDate').value = today;
             
-            // Навешиваем тайный клик на заголовок второй карточки (h3)
             const titleH3 = document.querySelector('h3');
             if (titleH3) {
                 titleH3.style.cursor = 'pointer';
@@ -307,7 +306,7 @@
                 todayBtn.classList.add('active-date');
                 yesterdayBtn.classList.remove('active-date');
             }
-            dateInput.value = targetDate.toISOString().split('T')[0];
+            dateInput.value = targetDate.toISOString().split('T');
             renderDebtors();
         }
 
@@ -422,24 +421,40 @@
             }
         }
 
+        // ОБНОВЛЕННАЯ ФУНКЦИЯ: КОПИРУЕТ И ТЕХ КТО СДАЛ, И ТЕХ КТО НЕ СДАЛ
         function copyForTelegram() {
             const selectedDate = document.getElementById('reportDate').value;
             const submittedOnDate = localSubmitted[selectedDate] || [];
             const debtors = allPvzList.filter(p => !submittedOnDate.includes(p));
 
-            if(debtors.length === 0) {
-                alert("Все ПВЗ сдали инкассацию!");
-                return;
+            let text = `📊 *ОТЧЕТ ПО ИНКАССАЦИИ ЗА ${selectedDate}*\n\n`;
+
+            // 1. Блок сдавших
+            text += `✅ *Сдали инкассацию (${submittedOnDate.length}):*\n`;
+            if (submittedOnDate.length > 0) {
+                text += submittedOnDate.join(', ') + '\n\n';
+            } else {
+                text += 'Пока никто не сдал\n\n';
             }
 
-            let text = `🔴 Список ПВЗ, не сдавших инкассацию за ${selectedDate}:\n\n`;
-            text += debtors.join(', ');
+            // 2. Блок не сдавших
+            text += `🔴 *Не сдали инкассацию (${debtors.length}):*\n`;
+            if (debtors.length > 0) {
+                text += debtors.join(', ') + '\n';
+            } else {
+                text += 'Все ПВЗ успешно сдали! 🎉\n';
+            }
 
             var dummy = document.createElement("textarea");
-            document.body.appendChild(dummy); dummy.value = text; dummy.select(); document.execCommand("copy"); document.body.removeChild(dummy);
-            alert("Список скопирован для Telegram!");
+            document.body.appendChild(dummy);
+            dummy.value = text; 
+            dummy.select(); 
+            document.execCommand("copy");
+            document.body.removeChild(dummy);
+            alert("Полный отчет (Сдали + Не сдали) скопирован в буфер обмена!");
         }
     </script>
 </body>
 </html>
+
 
