@@ -3,381 +3,229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Uzum Инкассация & Калькулятор</title>
+    <title>Uzum Инкассация & Отчеты</title>
     <style>
         :root {
             --uzum-purple: #7C3AED;
-            --uzum-dark: #1F2937;
-            --uzum-bg: #F3F4F6;
+            --uzum-purple-hover: #6D28D9;
+            --uzum-dark-bg: #130F26;
+            --uzum-card-bg: #1F193D;
+            --uzum-input-bg: #2D2554;
+            --text-main: #FFFFFF;
+            --text-muted: #9CA3AF;
+            --success-green: #10B981;
+            --error-red: #EF4444;
+            --badge-bg: #3B1B37;
         }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--uzum-bg);
-            color: var(--uzum-dark);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--uzum-dark-bg);
+            color: var(--text-main);
             margin: 0;
             padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
         }
         .container {
-            background: white;
+            background: var(--uzum-card-bg);
             padding: 25px;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
             width: 100%;
             max-width: 480px;
             box-sizing: border-box;
             margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
         }
-        h2 {
-            color: var(--uzum-purple);
+        h2, h3 {
+            color: var(--text-main);
             margin-top: 0;
             text-align: center;
-            border-bottom: 2px solid var(--uzum-bg);
-            padding-bottom: 10px;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        h3 {
+            font-size: 18px;
+            text-align: left;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         label {
             display: block;
-            margin: 15px 0 5px;
+            margin: 15px 0 6px;
             font-weight: 600;
+            font-size: 13px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-        select, input, textarea {
+        select, textarea, input[type="date"] {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #E5E7EB;
-            border-radius: 8px;
+            padding: 14px 16px;
+            border: 2px solid transparent;
+            border-radius: 14px;
             box-sizing: border-box;
             font-size: 16px;
             outline: none;
-            transition: 0.2s;
+            background-color: var(--uzum-input-bg);
+            color: var(--text-main);
+            transition: all 0.2s ease;
         }
-        select:focus, input:focus, textarea:focus {
+        select:focus, textarea:focus, input[type="date"]:focus {
             border-color: var(--uzum-purple);
+            box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.3);
         }
-        .status-group {
+        .status-group, .date-quick-group {
             display: flex;
             gap: 10px;
-            margin-top: 10px;
+            margin-top: 8px;
         }
-        .status-btn {
+        .status-btn, .quick-date-btn {
             flex: 1;
             padding: 12px;
-            border: 2px solid #E5E7EB;
-            border-radius: 8px;
-            background: white;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.03);
+            color: var(--text-main);
             cursor: pointer;
-            font-weight: bold;
-            font-size: 16px;
-            transition: 0.2s;
+            font-weight: 700;
+            font-size: 15px;
+            transition: all 0.2s ease;
+        }
+        .status-btn:active, .quick-date-btn:active {
+            transform: scale(0.96);
         }
         .status-btn.active-yes {
-            background: #10B981;
-            color: white;
-            border-color: #10B981;
+            background: var(--success-green) !important;
+            border-color: var(--success-green) !important;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
         }
         .status-btn.active-no {
-            background: #EF4444;
-            color: white;
-            border-color: #EF4444;
+            background: var(--error-red) !important;
+            border-color: var(--error-red) !important;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
         }
-        .denom-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            background: var(--uzum-bg);
-            padding: 8px 12px;
-            border-radius: 8px;
-        }
-        .denom-label {
-            font-weight: bold;
-            width: 100px;
-        }
-        .denom-input {
-            width: 80px;
-            padding: 6px;
-            text-align: center;
-        }
-        .denom-sum {
-            width: 140px;
-            text-align: right;
-            font-size: 14px;
-            color: #6B7280;
-        }
-        .total-box {
-            background: #EDF2F7;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            font-size: 20px;
-            font-weight: bold;
-            margin-top: 15px;
-            color: var(--uzum-purple);
-        }
-        .submit-btn, .reset-btn {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 15px;
-            transition: 0.2s;
+        .quick-date-btn.active-date {
+            background: var(--uzum-purple) !important;
+            border-color: var(--uzum-purple) !important;
         }
         .submit-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 20px;
             background: var(--uzum-purple);
             color: white;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
         }
         .submit-btn:hover {
-            background: #6D28D9;
+            background: var(--uzum-purple-hover);
         }
-        .reset-btn {
-            background: #E5E7EB;
-            color: #374151;
+        
+        /* СТИЛИ ПАНЕЛИ ОТЧЕТОВ */
+        .filter-chips {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 4px;
         }
-        .reset-btn:hover {
-            background: #D1D5DB;
+        .chip {
+            padding: 8px 14px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            color: var(--text-muted);
+            transition: 0.2s;
+        }
+        .chip span {
+            background: rgba(255,255,255,0.15);
+            padding: 1px 6px;
+            border-radius: 10px;
+            margin-left: 4px;
+            font-size: 11px;
+            color: white;
+        }
+        .chip.active-chip {
+            background: var(--uzum-purple);
+            color: white;
+            border-color: var(--uzum-purple);
+        }
+        .debtors-container {
+            background: rgba(239, 68, 68, 0.05);
+            border: 1px solid rgba(239, 68, 68, 0.15);
+            padding: 15px;
+            border-radius: 16px;
+            margin-top: 15px;
+        }
+        .debtors-title {
+            color: var(--error-red);
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .grid-pvz {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            max-height: 220px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+        .pvz-tag {
+            background: var(--badge-bg);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #FFA4A4;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .tg-copy-btn {
+            width: 100%;
+            padding: 14px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-main);
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+        .tg-copy-btn:hover {
+            background: rgba(255,255,255,0.1);
         }
     </style>
 </head>
 <body>
 
-    <!-- БЛОК 1: ИНКАССАЦИЯ ПВЗ -->
+    <!-- БЛОК ВВОДА ДАННЫХ -->
     <div class="container">
         <h2>Инкассация ПВЗ</h2>
         
         <label for="pvzSelect">Выберите ПВЗ:</label>
         <select id="pvzSelect">
             <option value="">-- Выберите ПВЗ --</option>
-            <option value="FrТАШ-160">FrТАШ-160</option>
-            <option value="FrТАШ-166">FrТАШ-166</option>
-            <option value="FrТАШ-167">FrТАШ-167</option>
-            <option value="FrТАШ-169">FrТАШ-169</option>
-            <option value="FrТАШ-171">FrТАШ-171</option>
-            <option value="FrТАШ-175">FrТАШ-175</option>
-            <option value="FrТАШ-176">FrТАШ-176</option>
-            <option value="FrТАШ-179">FrТАШ-179</option>
-            <option value="FrТАШ-181">FrТАШ-181</option>
-            <option value="FrТАШ-184">FrТАШ-184</option>
-            <option value="FrТАШ-185">FrТАШ-185</option>
-            <option value="FrТАШ-187">FrТАШ-187</option>
-            <option value="FrТАШ-188">FrТАШ-188</option>
-            <option value="FrТАШ-189">FrТАШ-189</option>
-            <option value="FrТАШ-192">FrТАШ-192</option>
-            <option value="FrТАШ-195">FrТАШ-195</option>
-            <option value="FrТАШ-196">FrТАШ-196</option>
-            <option value="FrТАШ-198">FrТАШ-198</option>
-            <option value="FrТАШ-200">FrТАШ-200</option>
-            <option value="FrТАШ-203">FrТАШ-203</option>
-            <option value="FrТАШ-205">FrТАШ-205</option>
-            <option value="FrТАШ-206">FrТАШ-206</option>
-            <option value="FrТАШ-208">FrТАШ-208</option>
-            <option value="FrТАШ-213">FrТАШ-213</option>
-            <option value="FrТАШ-215">FrТАШ-215</option>
-            <option value="FrТАШ-219">FrТАШ-219</option>
-            <option value="FrТАШ-220">FrТАШ-220</option>
-            <option value="FrТАШ-225">FrТАШ-225</option>
-            <option value="FrТАШ-227">FrТАШ-227</option>
-            <option value="FrТАШ-230">FrТАШ-230</option>
-            <option value="FrТАШ-232">FrТАШ-232</option>
-            <option value="FrТАШ-237">FrТАШ-237</option>
-            <option value="FrТАШ-239">FrТАШ-239</option>
-            <option value="FrТАШ-243">FrТАШ-243</option>
-            <option value="FrТАШ-247">FrТАШ-247</option>
-            <option value="FrТАШ-250">FrТАШ-250</option>
-            <option value="FrТАШ-251">FrТАШ-251</option>
-            <option value="FrТАШ-258">FrТАШ-258</option>
-            <option value="FrТАШ-261">FrТАШ-261</option>
-            <option value="FrТАШ-265">FrТАШ-265</option>
-            <option value="FrТАШ-266">FrТАШ-266</option>
-            <option value="FrТАШ-269">FrТАШ-269</option>
-            <option value="FrТАШ-271">FrТАШ-271</option>
-            <option value="FrТАШ-275">FrТАШ-275</option>
-            <option value="FrТАШ-277">FrТАШ-277</option>
-            <option value="FrТАШ-282">FrТАШ-282</option>
-            <option value="FrТАШ-283">FrТАШ-283</option>
-            <option value="FrТАШ-284">FrТАШ-284</option>
-            <option value="FrТАШ-285">FrТАШ-285</option>
-            <option value="FrТАШ-286">FrТАШ-286</option>
-            <option value="FrТАШ-287">FrТАШ-287</option>
-            <option value="FrТАШ-292">FrТАШ-292</option>
-            <option value="FrТАШ-293">FrТАШ-293</option>
-            <option value="FrТАШ-296">FrТАШ-296</option>
-            <option value="FrТАШ-297">FrТАШ-297</option>
-            <option value="FrТАШ-298">FrТАШ-298</option>
-            <option value="FrТАШ-304">FrТАШ-304</option>
-            <option value="FrТАШ-309">FrТАШ-309</option>
-            <option value="FrТАШ-310">FrТАШ-310</option>
-            <option value="FrТАШ-317">FrТАШ-317</option>
-            <option value="FrТАШ-318">FrТАШ-318</option>
-            <option value="FrТАШ-321">FrТАШ-321</option>
-            <option value="FrТАШ-322">FrТАШ-322</option>
-            <option value="FrТАШ-323">FrТАШ-323</option>
-            <option value="FrТАШ-325">FrТАШ-325</option>
-            <option value="FrТАШ-330">FrТАШ-330</option>
-            <option value="FrТАШ-331">FrТАШ-331</option>
-            <option value="FrТАШ-332">FrТАШ-332</option>
-            <option value="FrТАШ-333">FrТАШ-333</option>
-            <option value="FrТАШ-335">FrТАШ-335</option>
-            <option value="FrТАШ-336">FrТАШ-336</option>
-            <option value="FrТАШ-337">FrТАШ-337</option>
-            <option value="FrТАШ-338">FrТАШ-338</option>
-            <option value="FrТАШ-339">FrТАШ-339</option>
-            <option value="FrТАШ-341">FrТАШ-341</option>
-            <option value="FrТАШ-342">FrТАШ-342</option>
-            <option value="FrТАШ-347">FrТАШ-347</option>
-            <option value="FrТАШ-352">FrТАШ-352</option>
-            <option value="FrТАШ-353">FrТАШ-353</option>
-            <option value="FrТАШ-355">FrТАШ-355</option>
-            <option value="FrТАШ-365">FrТАШ-365</option>
-            <option value="FrТАШ-369">FrТАШ-369</option>
-            <option value="FrТАШ-370">FrТАШ-370</option>
-            <option value="FrТАШ-373">FrТАШ-373</option>
-            <option value="FrТАШ-376">FrТАШ-376</option>
-            <option value="FrТАШ-378">FrТАШ-378</option>
-            <option value="FrТАШ-379">FrТАШ-379</option>
-            <option value="FrТАШ-389">FrТАШ-389</option>
-            <option value="FrТАШ-393">FrТАШ-393</option>
-            <option value="FrТАШ-395">FrТАШ-395</option>
-            <option value="FrТАШ-397">FrТАШ-397</option>
-            <option value="FrТАШ-398">FrТАШ-398</option>
-            <option value="FrТАШ-401">FrТАШ-401</option>
-            <option value="FrТАШ-406">FrТАШ-406</option>
-            <option value="FrТАШ-407">FrТАШ-407</option>
-            <option value="FrТАШ-409">FrТАШ-409</option>
-            <option value="FrТАШ-411">FrТАШ-411</option>
-            <option value="FrТАШ-412">FrТАШ-412</option>
-            <option value="FrТАШ-414">FrТАШ-414</option>
-            <option value="FrТАШ-415">FrТАШ-415</option>
-            <option value="FrТАШ-417">FrТАШ-417</option>
-            <option value="FrТАШ-418">FrТАШ-418</option>
-            <option value="FrТАШ-419">FrТАШ-419</option>
-            <option value="FrТАШ-428">FrТАШ-428</option>
-            <option value="FrТАШ-429">FrТАШ-429</option>
-            <option value="FrТАШ-439">FrТАШ-439</option>
-            <option value="FrЧИН-9">FrЧИН-9</option>
-        </select>
-        <label>Статус инкассации:</label>
-        <div class="status-group">
-            <button type="button" class="status-btn" id="btnYes" onclick="setStatus(true)">Сдано ✅</button>
-            <button type="button" class="status-btn" id="btnNo" onclick="setStatus(false)">Не сдано ❌</button>
-        </div>
-
-        <label for="comment">Причина / Комментарий:</label>
-        <textarea id="comment" rows="3" placeholder="Укажите причину, если ПВЗ не сдал кассу..."></textarea>
-    </div>
-
-    <!-- БЛОК 2: КАЛЬКУЛЯТОР КУПЮР -->
-    <div class="container">
-        <h2>Калькулятор купюр (UZS)</h2>
-        <div id="calculator"></div>
-        <div class="total-box" id="grandTotal">ИТОГО: 0 сум</div>
-        
-        <button class="submit-btn" onclick="sendData()">Сохранить данные в таблицу</button>
-        <button class="reset-btn" onclick="resetAll()">Очистить всё</button>
-    </div>
-
-    <script>
-        let isCollected = null;
-        const denominations =;
-        
-        // Генерация полей калькулятора
-        const calContainer = document.getElementById('calculator');
-        denominations.forEach(denom => {
-            const row = document.createElement('div');
-            row.className = 'denom-row';
-            row.innerHTML = `
-                <div class="denom-label">${denom.toLocaleString()} сум</div>
-                <input type="number" class="denom-input" id="input-${denom}" min="0" placeholder="0" oninput="calculateTotal()">
-                <div class="denom-sum" id="sum-${denom}">0 сум</div>
-            `;
-            calContainer.appendChild(row);
-        });
-
-        function setStatus(status) {
-            isCollected = status;
-            const btnYes = document.getElementById('btnYes');
-            const btnNo = document.getElementById('btnNo');
-            
-            if(status) {
-                btnYes.classList.add('active-yes');
-                btnNo.classList.remove('active-no');
-            } else {
-                btnNo.classList.add('active-no');
-                btnYes.classList.remove('active-yes');
-            }
-        }
-
-        function calculateTotal() {
-            let grandTotal = 0;
-            denominations.forEach(denom => {
-                const count = parseInt(document.getElementById(`input-${denom}`).value) || 0;
-                const rowSum = count * denom;
-                grandTotal += rowSum;
-                document.getElementById(`sum-${denom}`).innerText = rowSum.toLocaleString() + ' сум';
-            });
-            document.getElementById('grandTotal').innerText = 'ИТОГО: ' + grandTotal.toLocaleString() + ' сум';
-        }
-
-        function resetAll() {
-            document.getElementById('pvzSelect').value = "";
-            document.getElementById('comment').value = "";
-            isCollected = null;
-            document.getElementById('btnYes').classList.remove('active-yes');
-            document.getElementById('btnNo').classList.remove('active-no');
-            
-            denominations.forEach(denom => {
-                document.getElementById(`input-${denom}`).value = "";
-            });
-            calculateTotal();
-        }
-
-        function sendData() {
-            const pvz = document.getElementById('pvzSelect').value;
-            const comment = document.getElementById('comment').value;
-            
-            if(!pvz) {
-                alert("Пожалуйста, выберите ПВЗ перед отправкой!");
-                return;
-            }
-            if(isCollected === null) {
-                alert("Пожалуйста, выберите статус инкассации!");
-                return;
-            }
-
-            let grandTotal = 0;
-            denominations.forEach(denom => {
-                const count = parseInt(document.getElementById(`input-${denom}`).value) || 0;
-                grandTotal += count * denom;
-            });
-
-            // Тот самый рабочий мост к вашей таблице
-            const webAppUrl = "https://google.com";
-
-            const payload = {
-                pvz: pvz,
-                status: isCollected,
-                comment: comment,
-                totalSum: grandTotal
-            };
-
-            fetch(webAppUrl, {
-                method: 'POST',
-                mode: 'no-cors',
-                cache: 'no-cache',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            })
-            .then(() => {
-                alert("Данные успешно отправлены в Google Таблицу!");
-                resetAll();
-            })
-            .catch(error => {
-                alert("Ошибка при отправке данных: " + error);
-            });
-        }
-    </script>
-</body>
-</html>
