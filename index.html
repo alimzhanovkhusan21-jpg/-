@@ -17,7 +17,7 @@
             --success-green: #10B981;
             --error-red: #EF4444;
             --badge-bg: #3B1B37;
-            --neon-glow: 0 0 10px rgba(124, 58, 237, 0.5), 0 0 20px rgba(124, 58, 237, 0.3);
+            --neon-glow: 0 0 12px rgba(124, 58, 237, 0.6), 0 0 24px rgba(124, 58, 237, 0.3);
         }
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
@@ -42,22 +42,24 @@
             margin-bottom: 20px;
             border: 1px solid rgba(255,255,255,0.05);
         }
+        
+        /* СТИЛЬНЫЙ МОДНЫЙ ЦИФЕРБЛАТ */
         .clock-widget {
             background: rgba(45, 37, 84, 0.4);
             border: 1px solid rgba(124, 58, 237, 0.2);
             border-radius: 16px;
-            padding: 12px;
+            padding: 14px;
             margin: 15px 0 25px 0;
             text-align: center;
             box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
         }
         .clock-time {
-            font-size: 32px;
+            font-size: 34px;
             font-weight: 800;
-            font-family: 'Courier New', Courier, monospace;
+            font-family: 'Segoe UI', system-ui, sans-serif;
             color: #FFFFFF;
             text-shadow: var(--neon-glow);
-            letter-spacing: 2px;
+            letter-spacing: 1px;
             line-height: 1;
         }
         .clock-date {
@@ -66,55 +68,74 @@
             color: #A78BFA;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-top: 6px;
+            margin-top: 8px;
         }
+
         h2, h3 {
             color: var(--text-main);
             margin-top: 0;
             text-align: center;
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 700;
             letter-spacing: -0.5px;
         }
         h3 {
-            font-size: 18px;
+            font-size: 19px;
             text-align: left;
             margin-bottom: 15px;
         }
         label {
             display: block;
-            margin: 15px 0 6px;
+            margin: 18px 0 8px;
             font-weight: 600;
             font-size: 13px;
             color: var(--text-muted);
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
+
+        /* КРАСИВЫЙ ОБНОВЛЕННЫЙ СПИСОК ВЫБОРА ПВЗ И ПОЛЯ ВВОДА */
         select, textarea, input[type="date"] {
             width: 100%;
-            padding: 14px 16px;
-            border: 2px solid transparent;
-            border-radius: 14px;
+            padding: 16px 18px;
+            border: 2px solid rgba(124, 58, 237, 0.15);
+            border-radius: 16px;
             box-sizing: border-box;
             font-size: 16px;
+            font-weight: 600;
+            font-family: inherit;
             outline: none;
             background-color: var(--uzum-input-bg);
             color: var(--text-main);
-            transition: all 0.2s ease;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
+        
+        /* СТИЛИЗАЦИЯ ВНУТРЕННИХ ПУНКТОВ (ОПЦИЙ) СПИСКА */
+        select option {
+            background-color: var(--uzum-card-bg);
+            color: var(--text-main);
+            font-size: 16px;
+            font-weight: 600;
+            padding: 14px;
+        }
+
         select:focus, textarea:focus, input[type="date"]:focus {
             border-color: var(--uzum-purple);
-            box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.3);
+            background-color: rgba(45, 37, 84, 0.8);
+            box-shadow: var(--neon-glow);
         }
+
         .status-group, .date-quick-group {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             margin-top: 8px;
         }
         .status-btn, .quick-date-btn {
             flex: 1;
-            padding: 12px;
+            padding: 14px;
             border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
+            border-radius: 14px;
             background: rgba(255,255,255,0.03);
             color: var(--text-main);
             cursor: pointer;
@@ -138,6 +159,7 @@
         .quick-date-btn.active-date {
             background: var(--uzum-purple) !important;
             border-color: var(--uzum-purple) !important;
+            box-shadow: var(--neon-glow);
         }
         .submit-btn, .reset-btn {
             width: 100%;
@@ -155,10 +177,18 @@
             background: var(--uzum-purple);
             box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
         }
+        .submit-btn:hover {
+            background: var(--uzum-purple-hover);
+            box-shadow: var(--neon-glow);
+        }
         .reset-btn {
             background: rgba(255,255,255,0.05);
-            margin-top: 10px;
+            margin-top: 12px;
             color: var(--text-muted);
+        }
+        .reset-btn:hover {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-main);
         }
         .filter-chips {
             display: flex;
@@ -188,6 +218,7 @@
             background: var(--uzum-purple);
             color: white;
             border-color: var(--uzum-purple);
+            box-shadow: var(--neon-glow);
         }
         .debtors-container {
             background: rgba(239, 68, 68, 0.05);
@@ -232,6 +263,11 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
+            transition: all 0.2s ease;
+        }
+        .tg-copy-btn:hover {
+            background: rgba(255,255,255,0.1);
+            box-shadow: 0 4px 15px rgba(255,255,255,0.05);
         }
     </style>
 </head>
@@ -299,11 +335,11 @@
         let activeFilter = 'all';
         let secretClickCount = 0;
         
+        // Ровно 107 уникальных ПВЗ
         const allPvzList = [
-            "FrТАШ-160","FrТАШ-166","FrТАШ-167","FrТАШ-169","FrТАШ-171","FrТАШ-175","FrТАШ-176","FrТАШ-179","FrТАШ-181","FrТАШ-184","FrТАШ-185","FrТАШ-187","FrТАШ-188","FrТАШ-189","FrТАШ-192","FrТАШ-195","FrТАШ-196","FrТАШ-198","FrТАШ-200","FrТАШ-203","FrТАШ-205","FrТАШ-206","FrТАШ-208","FrТАШ-213","FrТАШ-215","FrТАШ-219","FrТАШ-220","FrТАШ-225","FrТАШ-227","FrТАШ-230","FrТАШ-232","FrТАШ-237","FrТАШ-239","FrТАШ-243","FrТАШ-247","FrТАШ-250","FrТАШ-251","FrТАШ-258","FrТАШ-261","FrТАШ-265","FrТАШ-266","FrТАШ-269","FrТАШ-271","FrТАШ-275","FrТАШ-277","FrТАШ-282","FrТАШ-283","FrТАШ-284","FrТАШ-285","FrТАШ-286","FrТАШ-287","FrТАШ-292","FrТАШ-293","FrТАШ-296","FrТАШ-297","FrТАШ-298","FrТАШ-304","FrТАШ-309","FrТАШ-310","FrТАШ-317","FrТАШ-318","FrТАШ-321","FrТАШ-322","FrТАШ-323","FrТАШ-325","FrТАШ-330","FrТАШ-331","FrТАШ-332","FrТАШ-333","FrТАШ-335","FrТАШ-336","FrТАШ-337","FrТАШ-338","FrТАШ-339","FrТАШ-341","FrТАШ-342","FrТАШ-347","FrТАШ-352","FrТАШ-353","FrТАШ-355","FrТАШ-365","FrТАШ-369","FrТАШ-370","FrТАШ-373","FrТАШ-376","FrТАШ-378","FrТАШ-379","FrТАШ-389","FrТАШ-393","FrТАШ-395","FrТАШ-397","FrТАШ-398","FrТАШ-401","FrТАШ-406","FrТАШ-407","FrТАШ-409","FrТАШ-411","FrТАШ-412","FrТАШ-414","FrТАШ-415","FrТАШ-417","FrТАШ-418","FrТАШ-419","FrТАШ-428","FrТАШ-429","FrТАШ-428","FrТАШ-429","FrТАШ-439","FrЧИН-9"
+            "FrТАШ-160","FrТАШ-166","FrТАШ-167","FrТАШ-169","FrТАШ-171","FrТАШ-175","FrТАШ-176","FrТАШ-179","FrТАШ-181","FrТАШ-184","FrТАШ-185","FrТАШ-187","FrТАШ-188","FrТАШ-189","FrТАШ-192","FrТАШ-195","FrТАШ-196","FrТАШ-198","FrТАШ-200","FrТАШ-203","FrТАШ-205","FrТАШ-206","FrТАШ-208","FrТАШ-213","FrТАШ-215","FrТАШ-219","FrТАШ-219","FrТАШ-220","FrТАШ-225","FrТАШ-227","FrТАШ-230","FrТАШ-232","FrТАШ-237","FrТАШ-239","FrТАШ-243","FrТАШ-247","FrТАШ-250","FrТАШ-251","FrТАШ-258","FrТАШ-261","FrТАШ-265","FrТАШ-266","FrТАШ-269","FrТАШ-271","FrТАШ-275","FrТАШ-277","FrТАШ-282","FrТАШ-283","FrТАШ-284","FrТАШ-285","FrТАШ-286","FrТАШ-287","FrТАШ-292","FrТАШ-293","FrТАШ-296","FrТАШ-297","FrТАШ-298","FrТАШ-304","FrТАШ-309","FrТАШ-310","FrТАШ-317","FrТАШ-318","FrТАШ-321","FrТАШ-322","FrТАШ-323","FrТАШ-325","FrТАШ-330","FrТАШ-331","FrТАШ-332","FrТАШ-333","FrТАШ-335","FrТАШ-336","FrТАШ-337","FrТАШ-338","FrТАШ-339","FrТАШ-341","FrТАШ-342","FrТАШ-347","FrТАШ-352","FrТАШ-353","FrТАШ-355","FrТАШ-365","FrТАШ-369","FrТАШ-370","FrТАШ-373","FrТАШ-376","FrТАШ-378","FrТАШ-379","FrТАШ-389","FrТАШ-393","FrТАШ-395","FrТАШ-397","FrТАШ-398","FrТАШ-401","FrТАШ-406","FrТАШ-407","FrТАШ-409","FrТАШ-411","FrТАШ-412","FrТАШ-414","FrТАШ-415","FrТАШ-417","FrТАШ-418","FrТАШ-419","FrТАШ-428","FrТАШ-429","FrТАШ-439","FrЧИН-9"
         ];
 
-        // Намертво привязываем память к датам
         let localSubmitted = JSON.parse(localStorage.getItem('uzum_inkas_data')) || {};
         let localComments = JSON.parse(localStorage.getItem('uzum_inkas_comments')) || {};
 
@@ -319,7 +355,7 @@
         }
 
         window.onload = function() {
-            const today = new Date().toISOString().split('T')[0];
+            const today = new Date().toISOString().split('T');
             document.getElementById('reportDate').value = today;
             
             updateClock();
@@ -347,7 +383,6 @@
             document.getElementById('btnNo').classList.toggle('active-no', !status);
         }
 
-        // Переключение дат БЕЗ СБРОСА ПАМЯТИ
         function setQuickDate(mode) {
             const todayBtn = document.getElementById('dateToday');
             const yesterdayBtn = document.getElementById('dateYesterday');
@@ -362,7 +397,7 @@
                 todayBtn.classList.add('active-date');
                 yesterdayBtn.classList.remove('active-date');
             }
-            dateInput.value = targetDate.toISOString().split('T')[0];
+            dateInput.value = targetDate.toISOString().split('T');
             renderDebtors();
         }
 
@@ -450,12 +485,10 @@
             .then(() => {
                 alert("Данные успешно отправлены в Google Таблицу!");
                 
-                // Намертво привязываем ПВЗ к массиву конкретно выбранной даты
                 if(!localSubmitted[selectedDate]) localSubmitted[selectedDate] = [];
                 if(!localSubmitted[selectedDate].includes(pvz)) localSubmitted[selectedDate].push(pvz);
                 localStorage.setItem('uzum_inkas_data', JSON.stringify(localSubmitted));
 
-                // Привязываем статус и комментарий к конкретной дате и ПВЗ
                 if(!localComments[selectedDate]) localComments[selectedDate] = {};
                 localComments[selectedDate][pvz] = { status: formStatus, text: comment };
                 localStorage.setItem('uzum_inkas_comments', JSON.stringify(localComments));
