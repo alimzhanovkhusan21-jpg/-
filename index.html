@@ -42,8 +42,6 @@
             margin-bottom: 20px;
             border: 1px solid rgba(255,255,255,0.05);
         }
-        
-        /* СТИЛЬНЫЙ МОДНЫЙ ЦИФЕРБЛАТ */
         .clock-widget {
             background: rgba(45, 37, 84, 0.4);
             border: 1px solid rgba(124, 58, 237, 0.2);
@@ -56,7 +54,6 @@
         .clock-time {
             font-size: 34px;
             font-weight: 800;
-            font-family: 'Segoe UI', system-ui, sans-serif;
             color: #FFFFFF;
             text-shadow: var(--neon-glow);
             letter-spacing: 1px;
@@ -70,7 +67,6 @@
             letter-spacing: 1px;
             margin-top: 8px;
         }
-
         h2, h3 {
             color: var(--text-main);
             margin-top: 0;
@@ -94,8 +90,82 @@
             letter-spacing: 0.5px;
         }
 
-        /* КРАСИВЫЙ ОБНОВЛЕННЫЙ СПИСОК ВЫБОРА ПВЗ И ПОЛЯ ВВОДА */
-        select, textarea, input[type="date"] {
+        /* КРУПНЫЙ И ЖИРНЫЙ СТИЛЬ МЕНЮ ВЫБОРА */
+        .custom-select-wrapper {
+            position: relative;
+            width: 100%;
+            user-select: none;
+        }
+        .custom-select-trigger {
+            width: 100%;
+            padding: 16px 18px;
+            background-color: var(--uzum-input-bg);
+            border: 2px solid rgba(124, 58, 237, 0.2);
+            border-radius: 16px;
+            color: var(--text-main);
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-sizing: border-box;
+            transition: all 0.2s ease;
+        }
+        .custom-select-trigger:after {
+            content: '▼';
+            font-size: 12px;
+            color: var(--uzum-purple);
+            transition: transform 0.2s ease;
+        }
+        .custom-select-wrapper.open .custom-select-trigger {
+            border-color: var(--uzum-purple);
+            box-shadow: var(--neon-glow);
+        }
+        .custom-select-wrapper.open .custom-select-trigger:after {
+            transform: rotate(180deg);
+        }
+        .custom-options {
+            position: absolute;
+            display: block;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: #251E49;
+            border: 2px solid var(--uzum-purple);
+            border-radius: 16px;
+            margin-top: 8px;
+            max-height: 280px;
+            overflow-y: auto;
+            z-index: 999;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5), var(--neon-glow);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+        }
+        .custom-select-wrapper.open .custom-options {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .custom-option {
+            padding: 14px 18px;
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+        .custom-option:last-child {
+            border-bottom: none;
+        }
+        .custom-option:hover {
+            background-color: var(--uzum-purple);
+            padding-left: 24px;
+        }
+        textarea, input[type="date"] {
             width: 100%;
             padding: 16px 18px;
             border: 2px solid rgba(124, 58, 237, 0.15);
@@ -107,25 +177,12 @@
             outline: none;
             background-color: var(--uzum-input-bg);
             color: var(--text-main);
-            cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.25s ease;
         }
-        
-        /* СТИЛИЗАЦИЯ ВНУТРЕННИХ ПУНКТОВ (ОПЦИЙ) СПИСКА */
-        select option {
-            background-color: var(--uzum-card-bg);
-            color: var(--text-main);
-            font-size: 16px;
-            font-weight: 600;
-            padding: 14px;
-        }
-
-        select:focus, textarea:focus, input[type="date"]:focus {
+        textarea:focus, input[type="date"]:focus {
             border-color: var(--uzum-purple);
-            background-color: rgba(45, 37, 84, 0.8);
             box-shadow: var(--neon-glow);
         }
-
         .status-group, .date-quick-group {
             display: flex;
             gap: 12px;
@@ -185,10 +242,6 @@
             background: rgba(255,255,255,0.05);
             margin-top: 12px;
             color: var(--text-muted);
-        }
-        .reset-btn:hover {
-            background: rgba(255,255,255,0.1);
-            color: var(--text-main);
         }
         .filter-chips {
             display: flex;
@@ -263,22 +316,15 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            transition: all 0.2s ease;
-        }
-        .tg-copy-btn:hover {
-            background: rgba(255,255,255,0.1);
-            box-shadow: 0 4px 15px rgba(255,255,255,0.05);
         }
     </style>
 </head>
 <body>
-    <!-- КАРТОЧКА ВВОДА ДАННЫХ -->
     <div class="container">
         <div style="text-align: center; margin-bottom: 10px;">
             <img src="logo.jpg" style="width: 90px; height: 90px; border-radius: 20px; box-shadow: 0 5px 20px rgba(124, 58, 237, 0.4); object-fit: cover;">
         </div>
         
-        <!-- МОДНЫЙ ЦИФЕРБЛАТ -->
         <div class="clock-widget">
             <div class="clock-time" id="liveClock">00:00:00</div>
             <div class="clock-date" id="liveDate">Загрузка даты...</div>
@@ -286,11 +332,11 @@
 
         <h2>Инкассация ПВЗ</h2>
         
-        <label for="pvzSelect">Выберите ПВЗ:</label>
-        <select id="pvzSelect">
-            <option value="">-- Выберите ПВЗ --</option>
-            <option value="FrТАШ-160">FrТАШ-160</option><option value="FrТАШ-166">FrТАШ-166</option><option value="FrТАШ-167">FrТАШ-167</option><option value="FrТАШ-169">FrТАШ-169</option><option value="FrТАШ-171">FrТАШ-171</option><option value="FrТАШ-175">FrТАШ-175</option><option value="FrТАШ-176">FrТАШ-176</option><option value="FrТАШ-179">FrТАШ-179</option><option value="FrТАШ-181">FrТАШ-181</option><option value="FrТАШ-184">FrТАШ-184</option><option value="FrТАШ-185">FrТАШ-185</option><option value="FrТАШ-187">FrТАШ-187</option><option value="FrТАШ-188">FrТАШ-188</option><option value="FrТАШ-189">FrТАШ-189</option><option value="FrТАШ-192">FrТАШ-192</option><option value="FrТАШ-195">FrТАШ-195</option><option value="FrТАШ-196">FrТАШ-196</option><option value="FrТАШ-198">FrТАШ-198</option><option value="FrТАШ-200">FrТАШ-200</option><option value="FrТАШ-203">FrТАШ-203</option><option value="FrТАШ-205">FrТАШ-205</option><option value="FrТАШ-206">FrТАШ-206</option><option value="FrТАШ-208">FrТАШ-208</option><option value="FrТАШ-213">FrТАШ-213</option><option value="FrТАШ-215">FrТАШ-215</option><option value="FrТАШ-219">FrТАШ-219</option><option value="FrТАШ-220">FrТАШ-220</option><option value="FrТАШ-225">FrТАШ-225</option><option value="FrТАШ-227">FrТАШ-227</option><option value="FrТАШ-230">FrТАШ-230</option><option value="FrТАШ-232">FrТАШ-232</option><option value="FrТАШ-237">FrТАШ-237</option><option value="FrТАШ-239">FrТАШ-239</option><option value="FrТАШ-243">FrТАШ-243</option><option value="FrТАШ-247">FrТАШ-247</option><option value="FrТАШ-250">FrТАШ-250</option><option value="FrТАШ-251">FrТАШ-251</option><option value="FrТАШ-258">FrТАШ-258</option><option value="FrТАШ-261">FrТАШ-261</option><option value="FrТАШ-265">FrТАШ-265</option><option value="FrТАШ-266">FrТАШ-266</option><option value="FrТАШ-269">FrТАШ-269</option><option value="FrТАШ-271">FrТАШ-271</option><option value="FrТАШ-275">FrТАШ-275</option><option value="FrТАШ-277">FrТАШ-277</option><option value="FrТАШ-282">FrТАШ-282</option><option value="FrТАШ-283">FrТАШ-283</option><option value="FrТАШ-284">FrТАШ-284</option><option value="FrТАШ-285">FrТАШ-285</option><option value="FrТАШ-286">FrТАШ-286</option><option value="FrТАШ-287">FrТАШ-287</option><option value="FrТАШ-292">FrТАШ-292</option><option value="FrТАШ-293">FrТАШ-293</option><option value="FrТАШ-296">FrТАШ-296</option><option value="FrТАШ-297">FrТАШ-297</option><option value="FrТАШ-298">FrТАШ-298</option><option value="FrТАШ-304">FrТАШ-304</option><option value="FrТАШ-309">FrТАШ-309</option><option value="FrТАШ-310">FrТАШ-310</option><option value="FrТАШ-317">FrТАШ-317</option><option value="FrТАШ-318">FrТАШ-318</option><option value="FrТАШ-321">FrТАШ-321</option><option value="FrТАШ-322">FrТАШ-322</option><option value="FrТАШ-323">FrТАШ-323</option><option value="FrТАШ-325">FrТАШ-325</option><option value="FrТАШ-330">FrТАШ-330</option><option value="FrТАШ-331">FrТАШ-331</option><option value="FrТАШ-332">FrТАШ-332</option><option value="FrТАШ-333">FrТАШ-333</option><option value="FrТАШ-335">FrТАШ-335</option><option value="FrТАШ-336">FrТАШ-336</option><option value="FrТАШ-337">FrТАШ-337</option><option value="FrТАШ-338">FrТАШ-338</option><option value="FrТАШ-339">FrТАШ-339</option><option value="FrТАШ-341">FrТАШ-341</option><option value="FrТАШ-342">FrТАШ-342</option><option value="FrТАШ-347">FrТАШ-347</option><option value="FrТАШ-352">FrТАШ-352</option><option value="FrТАШ-353">FrТАШ-353</option><option value="FrТАШ-355">FrТАШ-355</option><option value="FrТАШ-365">FrТАШ-365</option><option value="FrТАШ-369">FrТАШ-369</option><option value="FrТАШ-370">FrТАШ-370</option><option value="FrТАШ-373">FrТАШ-373</option><option value="FrТАШ-376">FrТАШ-376</option><option value="FrТАШ-378">FrТАШ-378</option><option value="FrТАШ-379">FrТАШ-379</option><option value="FrТАШ-389">FrТАШ-389</option><option value="FrТАШ-393">FrТАШ-393</option><option value="FrТАШ-395">FrТАШ-395</option><option value="FrТАШ-397">FrТАШ-397</option><option value="FrТАШ-398">FrТАШ-398</option><option value="FrТАШ-401">FrТАШ-401</option><option value="FrТАШ-406">FrТАШ-406</option><option value="FrТАШ-407">FrТАШ-407</option><option value="FrТАШ-409">FrТАШ-409</option><option value="FrТАШ-411">FrТАШ-411</option><option value="FrТАШ-412">FrТАШ-412</option><option value="FrТАШ-414">FrТАШ-414</option><option value="FrТАШ-415">FrТАШ-415</option><option value="FrТАШ-417">FrТАШ-417</option><option value="FrТАШ-418">FrТАШ-418</option><option value="FrТАШ-419">FrТАШ-419</option><option value="FrТАШ-428">FrТАШ-428</option><option value="FrТАШ-429">FrТАШ-429</option><option value="FrТАШ-439">FrТАШ-439</option><option value="FrЧИН-9">FrЧИН-9</option>
-        </select>
+        <label>Выберите ПВЗ:</label>
+        <div class="custom-select-wrapper" id="pvzDropdown">
+            <div class="custom-select-trigger" id="dropdownTrigger">-- Выберите ПВЗ --</div>
+            <div class="custom-options" id="dropdownOptions"></div>
+        </div>
 
         <label>Статус инкассации:</label>
         <div class="status-group">
@@ -334,10 +380,11 @@
         let formStatus = null;
         let activeFilter = 'all';
         let secretClickCount = 0;
+        let selectedPvzValue = "";
         
-        // Ровно 107 уникальных ПВЗ
+        // Ровно 107 уникальных ПВЗ без дубликатов
         const allPvzList = [
-            "FrТАШ-160","FrТАШ-166","FrТАШ-167","FrТАШ-169","FrТАШ-171","FrТАШ-175","FrТАШ-176","FrТАШ-179","FrТАШ-181","FrТАШ-184","FrТАШ-185","FrТАШ-187","FrТАШ-188","FrТАШ-189","FrТАШ-192","FrТАШ-195","FrТАШ-196","FrТАШ-198","FrТАШ-200","FrТАШ-203","FrТАШ-205","FrТАШ-206","FrТАШ-208","FrТАШ-213","FrТАШ-215","FrТАШ-219","FrТАШ-219","FrТАШ-220","FrТАШ-225","FrТАШ-227","FrТАШ-230","FrТАШ-232","FrТАШ-237","FrТАШ-239","FrТАШ-243","FrТАШ-247","FrТАШ-250","FrТАШ-251","FrТАШ-258","FrТАШ-261","FrТАШ-265","FrТАШ-266","FrТАШ-269","FrТАШ-271","FrТАШ-275","FrТАШ-277","FrТАШ-282","FrТАШ-283","FrТАШ-284","FrТАШ-285","FrТАШ-286","FrТАШ-287","FrТАШ-292","FrТАШ-293","FrТАШ-296","FrТАШ-297","FrТАШ-298","FrТАШ-304","FrТАШ-309","FrТАШ-310","FrТАШ-317","FrТАШ-318","FrТАШ-321","FrТАШ-322","FrТАШ-323","FrТАШ-325","FrТАШ-330","FrТАШ-331","FrТАШ-332","FrТАШ-333","FrТАШ-335","FrТАШ-336","FrТАШ-337","FrТАШ-338","FrТАШ-339","FrТАШ-341","FrТАШ-342","FrТАШ-347","FrТАШ-352","FrТАШ-353","FrТАШ-355","FrТАШ-365","FrТАШ-369","FrТАШ-370","FrТАШ-373","FrТАШ-376","FrТАШ-378","FrТАШ-379","FrТАШ-389","FrТАШ-393","FrТАШ-395","FrТАШ-397","FrТАШ-398","FrТАШ-401","FrТАШ-406","FrТАШ-407","FrТАШ-409","FrТАШ-411","FrТАШ-412","FrТАШ-414","FrТАШ-415","FrТАШ-417","FrТАШ-418","FrТАШ-419","FrТАШ-428","FrТАШ-429","FrТАШ-439","FrЧИН-9"
+            "FrТАШ-160","FrТАШ-166","FrТАШ-167","FrТАШ-169","FrТАШ-171","FrТАШ-175","FrТАШ-176","FrТАШ-179","FrТАШ-181","FrТАШ-184","FrТАШ-185","FrТАШ-187","FrТАШ-188","FrТАШ-189","FrТАШ-192","FrТАШ-195","FrТАШ-196","FrТАШ-198","FrТАШ-200","FrТАШ-203","FrТАШ-205","FrТАШ-206","FrТАШ-208","FrТАШ-213","FrТАШ-215","FrТАШ-219","FrТАШ-220","FrТАШ-225","FrТАШ-227","FrТАШ-230","FrТАШ-232","FrТАШ-237","FrТАШ-239","FrТАШ-243","FrТАШ-247","FrТАШ-250","FrТАШ-251","FrТАШ-258","FrТАШ-261","FrТАШ-265","FrТАШ-266","FrТАШ-269","FrТАШ-271","FrТАШ-275","FrТАШ-277","FrТАШ-282","FrТАШ-283","FrТАШ-284","FrТАШ-285","FrТАШ-286","FrТАШ-287","FrТАШ-292","FrТАШ-293","FrТАШ-296","FrТАШ-297","FrТАШ-298","FrТАШ-304","FrТАШ-309","FrТАШ-310","FrТАШ-317","FrТАШ-318","FrТАШ-321","FrТАШ-322","FrТАШ-323","FrТАШ-325","FrТАШ-330","FrТАШ-331","FrТАШ-332","FrТАШ-333","FrТАШ-335","FrТАШ-336","FrТАШ-337","FrТАШ-338","FrТАШ-339","FrТАШ-341","FrТАШ-342","FrТАШ-347","FrТАШ-352","FrТАШ-353","FrТАШ-355","FrТАШ-365","FrТАШ-369","FrТАШ-370","FrТАШ-373","FrТАШ-376","FrТАШ-378","FrТАШ-379","FrТАШ-389","FrТАШ-393","FrТАШ-395","FrТАШ-397","FrТАШ-398","FrТАШ-401","FrТАШ-406","FrТАШ-407","FrТАШ-409","FrТАШ-411","FrТАШ-412","FrТАШ-414","FrТАШ-415","FrТАШ-417","FrТАШ-418","FrТАШ-419","FrТАШ-428","FrТАШ-429","FrТАШ-439","FrЧИН-9"
         ];
 
         let localSubmitted = JSON.parse(localStorage.getItem('uzum_inkas_data')) || {};
@@ -354,12 +401,48 @@
             document.getElementById('liveDate').innerText = now.toLocaleDateString('ru-RU', options);
         }
 
+        // Построение кастомного модного меню выбора с крупным жирным шрифтом
+        function buildCustomDropdown() {
+            const optionsContainer = document.getElementById('dropdownOptions');
+            optionsContainer.innerHTML = "";
+
+            const defaultOpt = document.createElement('div');
+            defaultOpt.className = 'custom-option';
+            defaultOpt.innerText = "-- Выберите ПВЗ --";
+            defaultOpt.onclick = function() { selectCustomOption("", "-- Выберите ПВЗ --"); };
+            optionsContainer.appendChild(defaultOpt);
+
+            allPvzList.forEach(pvz => {
+                const opt = document.createElement('div');
+                opt.className = 'custom-option';
+                opt.innerText = pvz;
+                opt.onclick = function() { selectCustomOption(pvz, pvz); };
+                optionsContainer.appendChild(opt);
+            });
+
+            document.getElementById('dropdownTrigger').onclick = function(e) {
+                e.stopPropagation();
+                document.getElementById('pvzDropdown').classList.toggle('open');
+            };
+
+            document.onclick = function() {
+                document.getElementById('pvzDropdown').classList.remove('open');
+            };
+        }
+
+        function selectCustomOption(value, label) {
+            selectedPvzValue = value;
+            document.getElementById('dropdownTrigger').innerText = label;
+            document.getElementById('pvzDropdown').classList.remove('open');
+        }
+
         window.onload = function() {
             const today = new Date().toISOString().split('T');
             document.getElementById('reportDate').value = today;
             
             updateClock();
             setInterval(updateClock, 1000);
+            buildCustomDropdown();
             
             const titleH3 = document.querySelector('h3');
             if (titleH3) {
@@ -456,7 +539,8 @@
             });
         }
         function resetAll() {
-            document.getElementById('pvzSelect').value = "";
+            selectedPvzValue = "";
+            document.getElementById('dropdownTrigger').innerText = "-- Выберите ПВЗ --";
             document.getElementById('comment').value = "";
             formStatus = null;
             document.getElementById('btnYes').classList.remove('active-yes');
@@ -464,7 +548,7 @@
         }
 
         function sendData() {
-            const pvz = document.getElementById('pvzSelect').value;
+            const pvz = selectedPvzValue;
             const comment = document.getElementById('comment').value;
             const selectedDate = document.getElementById('reportDate').value;
             
