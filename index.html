@@ -17,6 +17,7 @@
             --success-green: #10B981;
             --error-red: #EF4444;
             --badge-bg: #3B1B37;
+            --neon-glow: 0 0 10px rgba(124, 58, 237, 0.5), 0 0 20px rgba(124, 58, 237, 0.3);
         }
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
@@ -41,6 +42,35 @@
             margin-bottom: 20px;
             border: 1px solid rgba(255,255,255,0.05);
         }
+        
+        /* СТИЛЬНЫЙ МОДНЫЙ ЦИФЕРБЛАТ */
+        .clock-widget {
+            background: rgba(45, 37, 84, 0.4);
+            border: 1px solid rgba(124, 58, 237, 0.2);
+            border-radius: 16px;
+            padding: 12px;
+            margin: 15px 0 25px 0;
+            text-align: center;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .clock-time {
+            font-size: 32px;
+            font-weight: 800;
+            font-family: 'Courier New', Courier, monospace; /* Модный цифровой шрифт */
+            color: #FFFFFF;
+            text-shadow: var(--neon-glow);
+            letter-spacing: 2px;
+            line-height: 1;
+        }
+        .clock-date {
+            font-size: 13px;
+            font-weight: 600;
+            color: #A78BFA;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 6px;
+        }
+
         h2, h3 {
             color: var(--text-main);
             margin-top: 0;
@@ -211,9 +241,16 @@
 <body>
     <!-- КАРТОЧКА ВВОДА ДАННЫХ -->
     <div class="container">
-        <div style="text-align: center; margin-bottom: 20px;">
+        <div style="text-align: center; margin-bottom: 10px;">
             <img src="logo.jpg" style="width: 90px; height: 90px; border-radius: 20px; box-shadow: 0 5px 20px rgba(124, 58, 237, 0.4); object-fit: cover;">
         </div>
+        
+        <!-- МОДНЫЙ ЦИФЕРБЛАТ -->
+        <div class="clock-widget">
+            <div class="clock-time" id="liveClock">00:00:00</div>
+            <div class="clock-date" id="liveDate">Загрузка даты...</div>
+        </div>
+
         <h2>Инкассация ПВЗ</h2>
         
         <label for="pvzSelect">Выберите ПВЗ:</label>
@@ -229,7 +266,7 @@
         </div>
 
         <label for="comment">Причина / Комментарий:</label>
-        <textarea id="comment" rows="3" placeholder="Укажите причину, если ПВЗ не сдал кассу..."></textarea>
+        <textarea id="comment" rows="3" placeholder="Укажите цену/причину, если ПВЗ не сдал кассу..."></textarea>
         <button class="submit-btn" onclick="sendData()">Сохранить в таблицу</button>
         <button class="reset-btn" onclick="resetAll()">Очистить форму</button>
     </div>
@@ -272,9 +309,28 @@
         let localSubmitted = JSON.parse(localStorage.getItem('uzum_inkas_data')) || {};
         let localComments = JSON.parse(localStorage.getItem('uzum_inkas_comments')) || {};
 
+        // Функция модных «живых» часов
+        function updateClock() {
+            const now = new Date();
+            
+            // Время 00:00:00
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('liveClock').innerText = `${hours}:${minutes}:${seconds}`;
+            
+            // Дата на русском языке
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('liveDate').innerText = now.toLocaleDateString('ru-RU', options);
+        }
+
         window.onload = function() {
-            const today = new Date().toISOString().split('T')[0];
+            const today = new Date().toISOString().split('T');
             document.getElementById('reportDate').value = today;
+            
+            // Запуск часов и их обновление каждую секунду
+            updateClock();
+            setInterval(updateClock, 1000);
             
             const titleH3 = document.querySelector('h3');
             if (titleH3) {
@@ -312,7 +368,7 @@
                 todayBtn.classList.add('active-date');
                 yesterdayBtn.classList.remove('active-date');
             }
-            dateInput.value = targetDate.toISOString().split('T')[0];
+            dateInput.value = targetDate.toISOString().split('T');
             renderDebtors();
         }
 
@@ -485,3 +541,5 @@
     </script>
 </body>
 </html>
+
+ 
