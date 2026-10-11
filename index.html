@@ -1054,7 +1054,7 @@
                 todayBtn.classList.add('active-date');
                 yesterdayBtn.classList.remove('active-date');
             }
-            dateInput.value = targetDate.toISOString().split('T')[0];
+            dateInput.value = targetDate.toISOString().split('T');
             renderDebtors();
         }
 
