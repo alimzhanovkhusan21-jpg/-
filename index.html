@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Uzum Инкассация & СЛА Приёмки</title>
+    <title>Uzum Инкассация & Контур Безопасности</title>
     <link rel="icon" type="image/jpeg" href="logo.jpg">
     <style>
         :root {
@@ -19,6 +19,11 @@
             --badge-bg: #3B1B37;
             --tg-blue: #24A1DE;
             --neon-glow: 0 0 12px rgba(124, 58, 237, 0.6), 0 0 24px rgba(124, 58, 237, 0.3);
+            
+            /* Цвета корпоративных ролей */
+            --role-admin: #F59E0B;
+            --role-tu: #3B82F6;
+            --role-staff: #A78BFA;
         }
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
@@ -45,7 +50,36 @@
             position: relative;
         }
         
-        /* БЛОКИРОВКА ФОРМЫ ДЛЯ НЕАВТОРИЗОВАННЫХ */
+        /* СТИЛЬНЫЕ КОРПОРАТИВНЫЕ БЕЙДЖИ РОЛЕЙ */
+        .role-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        .role-badge.admin {
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid var(--role-admin);
+            color: var(--role-admin);
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
+        }
+        .role-badge.tu {
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid var(--role-tu);
+            color: var(--role-tu);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+        }
+        .role-badge.staff {
+            background: rgba(167, 139, 250, 0.15);
+            border: 1px solid var(--role-staff);
+            color: var(--role-staff);
+        }
+
         .lock-overlay {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -68,7 +102,6 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-        /* КНОПКА ТЕЛЕГРАМ С ИСПРАВЛЕННЫМ КЛИКОМ */
         .tg-login-btn {
             background: var(--tg-blue);
             color: white;
@@ -92,7 +125,6 @@
             box-shadow: 0 6px 20px rgba(36, 161, 222, 0.4);
         }
 
-        /* МОДНОЕ ОКНО ВХОДА ПО ЦЕНТРУ ЭКРАНА */
         .auth-modal {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -128,7 +160,6 @@
             transform: scale(1);
         }
 
-        /* ПЕРЕКЛЮЧАТЕЛЬ: НИКНЕЙМ / НОМЕР ТЕЛИФОНА */
         .auth-tabs {
             display: flex;
             background: rgba(0, 0, 0, 0.2);
@@ -158,6 +189,41 @@
         .auth-input-group.active {
             display: block;
         }
+
+        /* ПОЛЕ ВВОДА ТЕЛЕФОНА С НЕПОДВИЖНЫМ ПРЕФИКСОМ +998 */
+        .phone-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+        .phone-prefix {
+            position: absolute;
+            left: 18px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #A78BFA;
+            user-select: none;
+        }
+        .phone-input-field {
+            padding-left: 65px !important; /* Сдвигаем ввод, чтобы не перекрыть +998 */
+        }
+
+        .change-num-btn {
+            background: none;
+            border: none;
+            color: #A78BFA;
+            font-size: 12px;
+            font-weight: 700;
+            text-decoration: underline;
+            cursor: pointer;
+            margin-top: 8px;
+            display: inline-block;
+        }
+        .change-num-btn:hover {
+            color: white;
+        }
+
         .user-profile-bar {
             background: rgba(255,255,255,0.03);
             border: 1px solid rgba(255,255,255,0.08);
@@ -175,6 +241,9 @@
             font-size: 14px;
             font-weight: 700;
             color: #A78BFA;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
         .logout-btn {
             background: rgba(239, 68, 68, 0.1);
@@ -193,7 +262,6 @@
             color: white;
         }
 
-        /* СТИЛИ ЮРИДИЧЕСКИХ МОДАЛЬНЫХ ОКН */
         .modal {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -208,10 +276,7 @@
             transition: all 0.3s ease;
             padding: 15px;
         }
-        .modal.open {
-            opacity: 1;
-            visibility: visible;
-        }
+        .modal.open { opacity: 1; visibility: visible; }
         .modal-content {
             background: var(--uzum-card-bg);
             border: 2px solid var(--uzum-purple);
@@ -243,10 +308,7 @@
             color: #D1D5DB;
             text-align: left;
         }
-        .modal-text h4 {
-            color: white;
-            margin: 15px 0 5px 0;
-        }
+        .modal-text h4 { color: white; margin: 15px 0 5px 0; }
 
         .clock-widget {
             background: rgba(45, 37, 84, 0.4);
@@ -599,7 +661,8 @@
         <button class="submit-btn" onclick="sendData()">Сохранить в таблицу</button>
         <button class="reset-btn" onclick="resetAll()">Очистить форму</button>
     </div>
-    <!-- КАРТОЧКА МОНИТОРИНГА ОТЧЁТОВ -->
+
+    <!-- КАРТОЧКА МОНИТОРИНГА -->
     <div class="container" id="monitoringCard">
         <div class="lock-overlay" id="reportLockOverlay">
             <div class="lock-overlay-text">Отчёты скрыты. Авторизуйтесь!</div>
@@ -638,16 +701,15 @@
             <span style="color: rgba(255,255,255,0.1);">|</span>
             <button class="footer-link" onclick="openModal('consentModal')">Согласие на обработку данных</button>
         </div>
-        <div>© Uzum, 2026 · Контур Безопасности SLA · Версия 2.5</div>
+        <div>© Uzum, 2026 · Контур Безопасности SLA · Версия 2.6</div>
     </div>
 
-    <!-- КРАСИВОЕ ФИОЛЕТОВОЕ ОКНО ВХОДА ТЕЛЕГРАМ ПО ЦЕНТРУ -->
+    <!-- КРАСИВОЕ ОКНО ВХОДА ТЕЛЕГРАМ ПО ЦЕНТРУ -->
     <div class="auth-modal" id="customAuthModal">
         <div class="auth-card">
             <h3 style="color: #24A1DE; margin-bottom: 5px;">Авторизация Telegram</h3>
             <p style="font-size: 13px; color: var(--text-muted); margin: 0;">Выберите удобный способ подтверждения аккаунта</p>
             
-            <!-- Переключатели вкладок -->
             <div class="auth-tabs">
                 <div class="auth-tab active" id="tabNick" onclick="switchAuthTab('nick')">По никнейму</div>
                 <div class="auth-tab" id="tabPhone" onclick="switchAuthTab('phone')">По номеру</div>
@@ -661,7 +723,12 @@
 
             <!-- Вкладка 2: Телефон -->
             <div class="auth-input-group" id="groupPhone">
-                <input type="tel" class="auth-field" id="authTelegramPhone" placeholder="+998 (__) ___-__-__">
+                <div class="phone-input-wrapper">
+                    <span class="phone-prefix">+998</span>
+                    <input type="tel" class="auth-field phone-input-field" id="authTelegramPhone" placeholder="XX XXX XX XX" maxlength="9">
+                </div>
+                <button class="change-num-btn" id="changeNumLink" style="display: none;" onclick="resetPhoneInputOnly()">✏️ Изменить номер телефона</button>
+                
                 <div id="phoneCodeSection" style="display: none; margin-top: 12px;">
                     <p style="font-size: 12px; color: var(--success-green); margin-bottom: 6px;">Служебный код отправлен в Telegram!</p>
                     <input type="text" class="auth-field" id="authTelegramCode" placeholder="Введи 4-значный код" maxlength="4" style="text-align: center; letter-spacing: 3px;">
@@ -710,8 +777,8 @@
         let activeFilter = 'all';
         let secretClickCount = 0;
         let selectedPvzValue = "";
-        let authMode = "nick"; // Текущий режим входа: nick или phone
-        let isCodeSent = false; // Был ли отправлен фейк-код СМС
+        let authMode = "nick"; 
+        let isCodeSent = false; 
         
         // Постоянная память аккаунта в браузере
         let tgUser = localStorage.getItem('uzum_tg_user') || null;
@@ -749,7 +816,17 @@
             document.getElementById('groupPhone').classList.toggle('active', tab === 'phone');
         }
 
-        // Обработка отправки форм нового красивого окна входа
+        // Функция принудительного сброса заблокированного номера телефона (кнопка Изменить)
+        function resetPhoneInputOnly() {
+            const phoneInput = document.getElementById('authTelegramPhone');
+            phoneInput.disabled = false;
+            phoneInput.value = "";
+            document.getElementById('phoneCodeSection').style.display = 'none';
+            document.getElementById('changeNumLink').style.display = 'none';
+            document.getElementById('authPhoneBtn').innerText = "Получить код в Telegram";
+            isCodeSent = false;
+        }
+        // Обработка отправки форм окна входа
         function submitAuth(type) {
             if (type === 'nick') {
                 let nickField = document.getElementById('authTelegramNick').value;
@@ -762,7 +839,6 @@
                     nickField = '@' + nickField;
                 }
                 tgUser = nickField;
-                localStorage.setItem('uzum_tg_user', tgUser);
                 completeAuthSuccess();
             } else if (type === 'phone') {
                 let phoneField = document.getElementById('authTelegramPhone').value;
@@ -771,54 +847,86 @@
                     return;
                 }
                 
-                // Шаг 1: Если код еще не отправлялся, симулируем отправку
+                // Очищаем номер от пробелов и дефисов для точной сверки
+                let cleanPhone = phoneField.replace(/\D/g, '');
+                
+                // Если пользователь случайно всё-таки ввёл 998 в начале, убираем его, чтобы не дублировать
+                if (cleanPhone.startsWith('998') && cleanPhone.length > 9) {
+                    cleanPhone = cleanPhone.substring(3);
+                }
+                
+                if (cleanPhone.length !== 9) {
+                    alert("Номер телефона должен содержать ровно 9 цифр после +998!");
+                    return;
+                }
+                // Шаг 1: Имитация отправки проверочного кода в Telegram
                 if (!isCodeSent) {
                     document.getElementById('phoneCodeSection').style.display = 'block';
+                    document.getElementById('changeNumLink').style.display = 'inline-block';
                     document.getElementById('authPhoneBtn').innerText = "Проверить код и войти";
-                    document.getElementById('authTelegramPhone').disabled = true; // блокируем телефон
+                    document.getElementById('authTelegramPhone').disabled = true; // Блокируем на время ввода кода
                     isCodeSent = true;
-                    alert("Сервисный код успешно сгенерирован и отправлен в ваш аккаунт Telegram! Пожалуйста, проверьте мессенджер.");
+                    alert("Сервисный код защиты отправлен в ваш аккаунт Telegram! Пожалуйста, проверьте мессенджер.");
                 } else {
-                    // Шаг 2: Если код отправлен, проверяем его ввод
+                    // Шаг 2: Проверка ввода кода
                     let codeField = document.getElementById('authTelegramCode').value;
                     if (!codeField || codeField.trim().length !== 4) {
                         alert("Введите корректный 4-значный код подтверждения!");
                         return;
                     }
                     
-                    // Успешный вход по номеру телефона
-                    tgUser = "Тлф: " + phoneField.trim();
-                    localStorage.setItem('uzum_tg_user', tgUser);
+                    // Сохраняем проверенный номер в международном формате
+                    tgUser = "+998" + cleanPhone;
                     completeAuthSuccess();
                 }
             }
         }
 
         function completeAuthSuccess() {
-            // Очищаем форму входа
+            // Мягкий сброс полей ввода перед закрытием окна
             document.getElementById('authTelegramNick').value = "";
             document.getElementById('authTelegramPhone').value = "";
             document.getElementById('authTelegramCode').value = "";
             document.getElementById('authTelegramPhone').disabled = false;
             document.getElementById('phoneCodeSection').style.display = 'none';
+            document.getElementById('changeNumLink').style.display = 'none';
             document.getElementById('authPhoneBtn').innerText = "Получить код в Telegram";
             isCodeSent = false;
             
             closeAuthModal();
             updateAuthUI();
             renderDebtors();
-            alert(`Вход в контур безопасности SLA выполнен успешно!\nТекущий аккаунт: ${tgUser}`);
         }
+        // Автоматическая проверка контактов и отрисовка ролей в шапке сайта
         function updateAuthUI() {
             const authBlock = document.getElementById('authStatusBlock');
             const formOverlay = document.getElementById('formLockOverlay');
             const reportOverlay = document.getElementById('reportLockOverlay');
 
             if (tgUser) {
+                let badgeClass = "staff";
+                let badgeText = "Администратор ПВЗ 🏢";
+                let normalized = tgUser.toLowerCase().replace(/\s+/g, '');
+
+                // Сверка контактов Владельца / Администратора системы
+                if (normalized === "@frtash192" || normalized === "+998331010516" || 
+                    normalized === "@khusan_alimzhanov" || normalized === "+998940108318") {
+                    badgeClass = "admin";
+                    badgeText = "Админ 👑";
+                } 
+                // Сверка контактов Территориального Управляющего (ТУ)
+                else if (normalized === "@ps_sergeevna" || normalized === "+998933433593") {
+                    badgeClass = "tu";
+                    badgeText = "ТУ 🚀";
+                }
+
                 authBlock.innerHTML = `
                     <div class="user-profile-bar">
-                        <div class="user-info">👤 Авторизован: <b>${tgUser}</b></div>
-                        <button class="logout-btn" onclick="logoutTelegram()">Выйти из аккаунта</button>
+                        <div class="user-info">
+                            <span>👤 Профиль: <b>${tgUser}</b></span>
+                            <span class="role-badge ${badgeClass}">${badgeText}</span>
+                        </div>
+                        <button class="logout-btn" onclick="logoutTelegram()">Выйти</button>
                     </div>
                 `;
                 if (formOverlay) formOverlay.style.display = 'none';
@@ -826,7 +934,7 @@
             } else {
                 authBlock.innerHTML = `
                     <div class="user-profile-bar" style="justify-content: center; gap: 15px; flex-wrap: wrap;">
-                        <span class="lock-overlay-text" style="margin-bottom:0; font-size:13px; color:#EF4444;">🔴 Доступ заблокирован</span>
+                        <span class="lock-overlay-text" style="margin-bottom:0; font-size:13px; color:#EF4444;">🔴 Контур безопасности заблокирован</span>
                         <button class="tg-login-btn" style="padding: 8px 16px; font-size: 13px; border-radius: 8px;" onclick="openAuthModal()">
                             Войти в аккаунт
                         </button>
@@ -838,14 +946,13 @@
         }
 
         function logoutTelegram() {
-            if (confirm("Вы уверены, что хотите выйти? Ввод данных и просмотр мониторинга будут заблокированы.")) {
+            if (confirm("Вы уверены, что хотите выйти из аккаунта? Контур безопасности будет заблокирован.")) {
                 tgUser = null;
                 localStorage.removeItem('uzum_tg_user');
                 updateAuthUI();
                 renderDebtors();
             }
         }
-
         function buildCustomDropdown() {
             const optionsContainer = document.getElementById('dropdownOptions');
             optionsContainer.innerHTML = "";
@@ -882,9 +989,9 @@
             document.getElementById('dropdownTrigger').innerText = label;
             document.getElementById('pvzDropdown').classList.remove('open');
         }
+
         window.onload = function() {
-            // Стабильное автозаполнение сегодняшней даты при загрузке страницы
-            const today = new Date().toISOString().split('T');
+            const today = new Date().toISOString().split('T')[0];
             document.getElementById('reportDate').value = today;
             
             updateClock();
@@ -922,7 +1029,7 @@
                 todayBtn.classList.add('active-date');
                 yesterdayBtn.classList.remove('active-date');
             }
-            dateInput.value = targetDate.toISOString().split('T');
+            dateInput.value = targetDate.toISOString().split('T')[0];
             renderDebtors();
         }
 
@@ -939,7 +1046,6 @@
             document.getElementById('chipNone').classList.toggle('active-chip', type === 'none');
             renderDebtors();
         }
-
         function renderDebtors() {
             const selectedDate = document.getElementById('reportDate').value;
             const container = document.getElementById('debtorsList');
@@ -980,12 +1086,6 @@
                 container.appendChild(tag);
             });
         }
-        function setFormStatus(status) {
-            if (!tgUser) { alert("Вы не авторизованы через Telegram!"); return; }
-            formStatus = status;
-            document.getElementById('btnYes').classList.toggle('active-yes', status);
-            document.getElementById('btnNo').classList.toggle('active-no', !status);
-        }
 
         function resetAll() {
             selectedPvzValue = "";
@@ -997,7 +1097,6 @@
         }
 
         function sendData() {
-            // КРИТИЧЕСКАЯ БЛОКИРОВКА СОХРАНЕНИЯ ДЛЯ ГОСТЕЙ
             if (!tgUser) { 
                 alert("Критическая ошибка защиты! Сохранение логов заблокировано. Пожалуйста, войдите в свой рабочий аккаунт Telegram."); 
                 return; 
@@ -1013,8 +1112,16 @@
 
             const webAppUrl = "https://google.com";
             
-            // Автоматически добавляем никнейм или телефон автора к отправляемому комментарию
-            const payload = { pvz: pvz, status: formStatus, comment: comment + ` (Автор: ${tgUser})`, totalSum: 0 };
+            // Фиксируем роль автора для логов Google Таблицы
+            let roleLabel = "Администратор ПВЗ";
+            let normalized = tgUser.toLowerCase().replace(/\s+/g, '');
+            if (normalized === "@frtash192" || normalized === "+998331010516" || normalized === "@khusan_alimzhanov" || normalized === "+998940108318") {
+                roleLabel = "Админ";
+            } else if (normalized === "@ps_sergeevna" || normalized === "+998933433593") {
+                roleLabel = "ТУ";
+            }
+
+            const payload = { pvz: pvz, status: formStatus, comment: comment + ` (Автор: ${tgUser}, Роль: ${roleLabel})`, totalSum: 0 };
 
             fetch(webAppUrl, {
                 method: 'POST',
@@ -1071,7 +1178,7 @@
             if (!tgUser) { alert("Отчёты скрыты до авторизации!"); return; }
             const selectedDate = document.getElementById('reportDate').value;
             const submittedOnDate = localSubmitted[selectedDate] || [];
-            const savedComments = localComments[selectedDate] || {};
+            const savedComments = localComments[savedComments] || {};
 
             let listSдали = [];
             let listNeСдалиСПричиной = [];
