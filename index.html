@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Uzum Инкассация & Контур Безопасности</title>
+    <title>Uzum Инкассация &amp; Контур Безопасности</title>
     <link rel="icon" type="image/jpeg" href="logo.jpg">
     <style>
         :root {
@@ -781,7 +781,7 @@
         let authMode = "nick"; 
         let isCodeSent = false; 
         
-        // Адрес вашего живого Google-сервера авторизации и сохранения данных
+        // Адрес вашего живого Google-сервера авторизации и сохранения данных (Версия 5)
         const webAppUrl = "https://google.com";
 
         // Постоянная память аккаунта в браузере
@@ -1015,8 +1015,8 @@
         }
 
         window.onload = function() {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('reportDate').value = today;
+            const today = new Date().toISOString().split('T');
+            document.getElementById('reportDate').value = today[0];
             
             updateClock();
             setInterval(updateClock, 1000);
@@ -1054,7 +1054,7 @@
                 todayBtn.classList.add('active-date');
                 yesterdayBtn.classList.remove('active-date');
             }
-            dateInput.value = targetDate.toISOString().split('T');
+            dateInput.value = targetDate.toISOString().split('T')[0];
             renderDebtors();
         }
 
