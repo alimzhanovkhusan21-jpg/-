@@ -50,6 +50,29 @@
             position: relative;
         }
         
+        /* БЛОКИРОВКА ФОРМЫ ДЛЯ НЕАВТОРИЗОВАННЫХ */
+        .lock-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(31, 25, 61, 0.95);
+            backdrop-filter: blur(8px);
+            border-radius: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            padding: 20px;
+            text-align: center;
+        }
+        .lock-overlay-text {
+            font-size: 16px;
+            font-weight: 700;
+            color: #FFA4A4;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
         /* СТИЛЬНЫЕ КОРПОРАТИВНЫЕ БЕЙДЖИ РОЛЕЙ */
         .role-badge {
             display: inline-block;
@@ -80,28 +103,6 @@
             color: var(--role-staff);
         }
 
-        .lock-overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(31, 25, 61, 0.95);
-            backdrop-filter: blur(8px);
-            border-radius: 24px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
-            padding: 20px;
-            text-align: center;
-        }
-        .lock-overlay-text {
-            font-size: 16px;
-            font-weight: 700;
-            color: #FFA4A4;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
         .tg-login-btn {
             background: var(--tg-blue);
             color: white;
@@ -125,6 +126,7 @@
             box-shadow: 0 6px 20px rgba(36, 161, 222, 0.4);
         }
 
+        /* МОДНОЕ ОКНО ВХОДА ПО ЦЕНТРУ ЭКРАНА */
         .auth-modal {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -159,7 +161,7 @@
         .auth-modal.open .auth-card {
             transform: scale(1);
         }
-
+        /* ПЕРЕКЛЮЧАТЕЛЬ: НИКНЕЙМ / НОМЕР ТЕЛЕФОНА */
         .auth-tabs {
             display: flex;
             background: rgba(0, 0, 0, 0.2);
@@ -223,7 +225,6 @@
         .change-num-btn:hover {
             color: white;
         }
-
         .user-profile-bar {
             background: rgba(255,255,255,0.03);
             border: 1px solid rgba(255,255,255,0.08);
@@ -262,6 +263,7 @@
             color: white;
         }
 
+        /* СТИЛИ ЮРИДИЧЕСКИХ МОДАЛЬНЫХ ОКН */
         .modal {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -661,8 +663,7 @@
         <button class="submit-btn" onclick="sendData()">Сохранить в таблицу</button>
         <button class="reset-btn" onclick="resetAll()">Очистить форму</button>
     </div>
-
-    <!-- КАРТОЧКА МОНИТОРИНГА -->
+    <!-- КАРТОЧКА МОНИТОРИНГА ОТЧЁТОВ -->
     <div class="container" id="monitoringCard">
         <div class="lock-overlay" id="reportLockOverlay">
             <div class="lock-overlay-text">Отчёты скрыты. Авторизуйтесь!</div>
@@ -780,6 +781,9 @@
         let authMode = "nick"; 
         let isCodeSent = false; 
         
+        // Адрес вашего живого Google-сервера авторизации и сохранения данных
+        const webAppUrl = "https://google.com";
+
         // Постоянная память аккаунта в браузере
         let tgUser = localStorage.getItem('uzum_tg_user') || null;
 
@@ -807,7 +811,7 @@
 
         function openAuthModal() { document.getElementById('customAuthModal').classList.add('open'); }
         function closeAuthModal() { document.getElementById('customAuthModal').classList.remove('open'); }
-        // Переключение способов входа: Ник / Номер телефона
+
         function switchAuthTab(tab) {
             authMode = tab;
             document.getElementById('tabNick').classList.toggle('active', tab === 'nick');
@@ -816,7 +820,6 @@
             document.getElementById('groupPhone').classList.toggle('active', tab === 'phone');
         }
 
-        // Функция принудительного сброса заблокированного номера телефона (кнопка Изменить)
         function resetPhoneInputOnly() {
             const phoneInput = document.getElementById('authTelegramPhone');
             phoneInput.disabled = false;
@@ -826,64 +829,85 @@
             document.getElementById('authPhoneBtn').innerText = "Получить код в Telegram";
             isCodeSent = false;
         }
-        // Обработка отправки форм окна входа
+        // НАСТОЯЩАЯ ОТПРАВКА И ПРОВЕРКА КОДОВ ЧЕРЕЗ ВАШ СЕРВЕР GOOGLE
         function submitAuth(type) {
             if (type === 'nick') {
                 let nickField = document.getElementById('authTelegramNick').value;
-                if (!nickField || !nickField.trim()) {
-                    alert("Пожалуйста, заполните поле никнейма!");
-                    return;
-                }
+                if (!nickField || !nickField.trim()) { alert("Пожалуйста, заполните поле никнейма!"); return; }
                 nickField = nickField.trim();
-                if (!nickField.startsWith('@')) {
-                    nickField = '@' + nickField;
-                }
+                if (!nickField.startsWith('@')) { nickField = '@' + nickField; }
                 tgUser = nickField;
                 completeAuthSuccess();
             } else if (type === 'phone') {
                 let phoneField = document.getElementById('authTelegramPhone').value;
-                if (!phoneField || !phoneField.trim()) {
-                    alert("Пожалуйста, укажите ваш номер телефона!");
-                    return;
-                }
+                if (!phoneField || !phoneField.trim()) { alert("Пожалуйста, укажите ваш номер телефона!"); return; }
                 
-                // Очищаем номер от пробелов и дефисов для точной сверки
                 let cleanPhone = phoneField.replace(/\D/g, '');
-                
-                // Если пользователь случайно всё-таки ввёл 998 в начале, убираем его, чтобы не дублировать
-                if (cleanPhone.startsWith('998') && cleanPhone.length > 9) {
-                    cleanPhone = cleanPhone.substring(3);
-                }
-                
-                if (cleanPhone.length !== 9) {
-                    alert("Номер телефона должен содержать ровно 9 цифр после +998!");
-                    return;
-                }
-                // Шаг 1: Имитация отправки проверочного кода в Telegram
+                if (cleanPhone.startsWith('998') && cleanPhone.length > 9) { cleanPhone = cleanPhone.substring(3); }
+                if (cleanPhone.length !== 9) { alert("Номер должен содержать ровно 9 цифр после +998!"); return; }
+
+                let fullPhone = "+998" + cleanPhone;
+
                 if (!isCodeSent) {
-                    document.getElementById('phoneCodeSection').style.display = 'block';
-                    document.getElementById('changeNumLink').style.display = 'inline-block';
-                    document.getElementById('authPhoneBtn').innerText = "Проверить код и войти";
-                    document.getElementById('authTelegramPhone').disabled = true; // Блокируем на время ввода кода
-                    isCodeSent = true;
-                    alert("Сервисный код защиты отправлен в ваш аккаунт Telegram! Пожалуйста, проверьте мессенджер.");
+                    document.getElementById('authPhoneBtn').innerText = "Отправка запроса...";
+                    document.getElementById('authPhoneBtn').disabled = true;
+
+                    fetch(webAppUrl, {
+                        method: 'POST',
+                        body: JSON.stringify({ action: "REQUEST_CODE", phone: fullPhone })
+                    })
+                    .then(res => res.json())
+                    .then(resData => {
+                        document.getElementById('authPhoneBtn').disabled = false;
+                        if (resData.success) {
+                            document.getElementById('phoneCodeSection').style.display = 'block';
+                            document.getElementById('changeNumLink').style.display = 'inline-block';
+                            document.getElementById('authPhoneBtn').innerText = "Проверить код и войти";
+                            document.getElementById('authTelegramPhone').disabled = true;
+                            isCodeSent = true;
+                            alert("Код отправлен ботом в ваш Telegram! Проверьте мессенджер.");
+                        } else {
+                            alert("Ошибка: " + resData.message);
+                            document.getElementById('authPhoneBtn').innerText = "Получить код в Telegram";
+                        }
+                    })
+                    .catch(err => {
+                        document.getElementById('authPhoneBtn').disabled = false;
+                        document.getElementById('authPhoneBtn').innerText = "Получить код в Telegram";
+                        alert("Ошибка соединения с сервером Google!");
+                    });
                 } else {
-                    // Шаг 2: Проверка ввода кода
                     let codeField = document.getElementById('authTelegramCode').value;
-                    if (!codeField || codeField.trim().length !== 4) {
-                        alert("Введите корректный 4-значный код подтверждения!");
-                        return;
-                    }
-                    
-                    // Сохраняем проверенный номер в международном формате
-                    tgUser = "+998" + cleanPhone;
-                    completeAuthSuccess();
+                    if (!codeField || codeField.trim().length !== 4) { alert("Введите 4-значный код!"); return; }
+
+                    document.getElementById('authPhoneBtn').innerText = "Проверка кода...";
+                    document.getElementById('authPhoneBtn').disabled = true;
+
+                    fetch(webAppUrl, {
+                        method: 'POST',
+                        body: JSON.stringify({ action: "VERIFY_CODE", phone: fullPhone, code: codeField.trim() })
+                    })
+                    .then(res => res.json())
+                    .then(resData => {
+                        document.getElementById('authPhoneBtn').disabled = false;
+                        if (resData.success) {
+                            tgUser = fullPhone;
+                            completeAuthSuccess();
+                        } else {
+                            alert("Ошибка: " + resData.message);
+                            document.getElementById('authPhoneBtn').innerText = "Проверить код и войти";
+                        }
+                    })
+                    .catch(err => {
+                        document.getElementById('authPhoneBtn').disabled = false;
+                        document.getElementById('authPhoneBtn').innerText = "Проверить код и войти";
+                        alert("Ошибка валидации на сервере Google!");
+                    });
                 }
             }
         }
 
         function completeAuthSuccess() {
-            // Мягкий сброс полей ввода перед закрытием окна
             document.getElementById('authTelegramNick').value = "";
             document.getElementById('authTelegramPhone').value = "";
             document.getElementById('authTelegramCode').value = "";
@@ -893,11 +917,12 @@
             document.getElementById('authPhoneBtn').innerText = "Получить код в Telegram";
             isCodeSent = false;
             
+            localStorage.setItem('uzum_tg_user', tgUser);
             closeAuthModal();
             updateAuthUI();
             renderDebtors();
+            alert(`Успешный вход в систему! Вы авторизованы под именем: ${tgUser}`);
         }
-        // Автоматическая проверка контактов и отрисовка ролей в шапке сайта
         function updateAuthUI() {
             const authBlock = document.getElementById('authStatusBlock');
             const formOverlay = document.getElementById('formLockOverlay');
@@ -908,14 +933,11 @@
                 let badgeText = "Администратор ПВЗ 🏢";
                 let normalized = tgUser.toLowerCase().replace(/\s+/g, '');
 
-                // Сверка контактов Владельца / Администратора системы
                 if (normalized === "@frtash192" || normalized === "+998331010516" || 
                     normalized === "@khusan_alimzhanov" || normalized === "+998940108318") {
                     badgeClass = "admin";
                     badgeText = "Админ 👑";
-                } 
-                // Сверка контактов Территориального Управляющего (ТУ)
-                else if (normalized === "@ps_sergeevna" || normalized === "+998933433593") {
+                } else if (normalized === "@ps_sergeevna" || normalized === "+998933433593") {
                     badgeClass = "tu";
                     badgeText = "ТУ 🚀";
                 }
@@ -923,7 +945,7 @@
                 authBlock.innerHTML = `
                     <div class="user-profile-bar">
                         <div class="user-info">
-                            <span>👤 Профиль: <b>${tgUser}</b></span>
+                            <span>👤 Аккаунт: <b>${tgUser}</b></span>
                             <span class="role-badge ${badgeClass}">${badgeText}</span>
                         </div>
                         <button class="logout-btn" onclick="logoutTelegram()">Выйти</button>
@@ -934,7 +956,7 @@
             } else {
                 authBlock.innerHTML = `
                     <div class="user-profile-bar" style="justify-content: center; gap: 15px; flex-wrap: wrap;">
-                        <span class="lock-overlay-text" style="margin-bottom:0; font-size:13px; color:#EF4444;">🔴 Контур безопасности заблокирован</span>
+                        <span class="lock-overlay-text" style="margin-bottom:0; font-size:13px; color:#EF4444;">🔴 Вы не авторизованы</span>
                         <button class="tg-login-btn" style="padding: 8px 16px; font-size: 13px; border-radius: 8px;" onclick="openAuthModal()">
                             Войти в аккаунт
                         </button>
@@ -946,7 +968,7 @@
         }
 
         function logoutTelegram() {
-            if (confirm("Вы уверены, что хотите выйти из аккаунта? Контур безопасности будет заблокирован.")) {
+            if (confirm("Вы уверены, что хотите выйти? Ввод отчётов будет заблокирован.")) {
                 tgUser = null;
                 localStorage.removeItem('uzum_tg_user');
                 updateAuthUI();
@@ -973,11 +995,8 @@
 
             document.getElementById('dropdownTrigger').onclick = function(e) {
                 e.stopPropagation();
-                if (tgUser) {
-                    document.getElementById('pvzDropdown').classList.toggle('open');
-                }
+                if (tgUser) { document.getElementById('pvzDropdown').classList.toggle('open'); }
             };
-
             document.onclick = function() {
                 const dropdown = document.getElementById('pvzDropdown');
                 if (dropdown) dropdown.classList.remove('open');
@@ -991,7 +1010,7 @@
         }
 
         window.onload = function() {
-            const today = new Date().toISOString().split('T')[0];
+            const today = new Date().toISOString().split('T');
             document.getElementById('reportDate').value = today;
             
             updateClock();
@@ -1004,22 +1023,23 @@
                 titleH3.style.cursor = 'pointer';
                 titleH3.addEventListener('click', function() {
                     secretClickCount++;
-                    if (secretClickCount === 3) {
-                        globalSecretReset();
-                        secretClickCount = 0;
-                    }
+                    if (secretClickCount === 3) { globalSecretReset(); secretClickCount = 0; }
                     setTimeout(() => { secretClickCount = 0; }, 2000);
                 });
             }
-
             renderDebtors();
         };
+        function setFormStatus(status) {
+            if (!tgUser) { alert("Вы не авторизованы через Telegram!"); return; }
+            formStatus = status;
+            document.getElementById('btnYes').classList.toggle('active-yes', status);
+            document.getElementById('btnNo').classList.toggle('active-no', !status);
+        }
 
         function setQuickDate(mode) {
             const todayBtn = document.getElementById('dateToday');
             const yesterdayBtn = document.getElementById('dateYesterday');
             const dateInput = document.getElementById('reportDate');
-            
             let targetDate = new Date();
             if(mode === 'yesterday') {
                 targetDate.setDate(targetDate.getDate() - 1);
@@ -1029,7 +1049,7 @@
                 todayBtn.classList.add('active-date');
                 yesterdayBtn.classList.remove('active-date');
             }
-            dateInput.value = targetDate.toISOString().split('T')[0];
+            dateInput.value = targetDate.toISOString().split('T');
             renderDebtors();
         }
 
@@ -1069,17 +1089,12 @@
             displayedPvz.forEach(pvz => {
                 const tag = document.createElement('div');
                 tag.className = 'pvz-tag';
-                
                 if(submittedOnDate.includes(pvz)) {
                     const isPvzCollected = savedComments[pvz] ? savedComments[pvz].status : true;
                     if (isPvzCollected) {
-                        tag.style.background = '#112F24';
-                        tag.style.borderColor = 'rgba(16, 185, 129, 0.3)';
-                        tag.style.color = '#A7F3D0';
+                        tag.style.background = '#112F24'; tag.style.borderColor = 'rgba(16, 185, 129, 0.3)'; tag.style.color = '#A7F3D0';
                     } else {
-                        tag.style.background = '#3B141A';
-                        tag.style.borderColor = 'rgba(239, 68, 68, 0.4)';
-                        tag.style.color = '#FCA5A5';
+                        tag.style.background = '#3B141A'; tag.style.borderColor = 'rgba(239, 68, 68, 0.4)'; tag.style.color = '#FCA5A5';
                     }
                 }
                 tag.innerText = pvz;
@@ -1095,24 +1110,16 @@
             document.getElementById('btnYes').classList.remove('active-yes');
             document.getElementById('btnNo').classList.remove('active-no');
         }
-
         function sendData() {
-            if (!tgUser) { 
-                alert("Критическая ошибка защиты! Сохранение логов заблокировано. Пожалуйста, войдите в свой рабочий аккаунт Telegram."); 
-                return; 
-            }
-
+            if (!tgUser) { alert("Ошибка защиты! Вход заблокирован."); return; }
             const pvz = selectedPvzValue;
             const comment = document.getElementById('comment').value;
             const selectedDate = document.getElementById('reportDate').value;
             
             if(!pvz) { alert("Выберите ПВЗ!"); return; }
             if(formStatus === null) { alert("Выберите статус!"); return; }
-            if(formStatus === false && !comment.trim()) { alert("Пожалуйста, обязательно укажите причину не сдачи!"); return; }
+            if(formStatus === false && !comment.trim()) { alert("Укажите причину не сдачи!"); return; }
 
-            const webAppUrl = "https://google.com";
-            
-            // Фиксируем роль автора для логов Google Таблицы
             let roleLabel = "Администратор ПВЗ";
             let normalized = tgUser.toLowerCase().replace(/\s+/g, '');
             if (normalized === "@frtash192" || normalized === "+998331010516" || normalized === "@khusan_alimzhanov" || normalized === "+998940108318") {
@@ -1132,7 +1139,6 @@
             })
             .then(() => {
                 alert("Данные успешно отправлены в Google Таблицу!");
-                
                 if(!localSubmitted[selectedDate]) localSubmitted[selectedDate] = [];
                 if(!localSubmitted[selectedDate].includes(pvz)) localSubmitted[selectedDate].push(pvz);
                 localStorage.setItem('uzum_inkas_data', JSON.stringify(localSubmitted));
@@ -1140,82 +1146,52 @@
                 if(!localComments[selectedDate]) localComments[selectedDate] = {};
                 localComments[selectedDate][pvz] = { status: formStatus, text: comment };
                 localStorage.setItem('uzum_inkas_comments', JSON.stringify(localComments));
-                
-                renderDebtors();
-                resetAll();
+                renderDebtors(); resetAll();
             })
             .catch(error => { alert("Ошибка отправки: " + error); });
         }
 
         function globalSecretReset() {
             if (!tgUser) { alert("Требуется авторизация!"); return; }
-            let pass = prompt("Введите пароль администратора для полного сброса системы:");
+            let pass = prompt("Введите пароль администратора:");
             if (pass === "1111") {
-                if (confirm("ВНИМАНИЕ! Это действие сотрет ВСЕ данные за этот день на сайте и в Google Таблице. Продолжить?")) {
-                    const webAppUrl = "https://google.com";
-                    
-                    fetch(webAppUrl, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        body: JSON.stringify({ action: "CLEAR_ALL" })
-                    })
+                if (confirm("ВНИМАНИЕ! Это действие сотрет ВСЕ данные за этот день.")) {
+                    fetch(webAppUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "CLEAR_ALL" }) })
                     .then(() => {
                         const selectedDate = document.getElementById('reportDate').value;
-                        localSubmitted[selectedDate] = [];
-                        localComments[selectedDate] = {};
+                        localSubmitted[selectedDate] = []; localComments[selectedDate] = {};
                         localStorage.setItem('uzum_inkas_data', JSON.stringify(localSubmitted));
                         localStorage.setItem('uzum_inkas_comments', JSON.stringify(localComments));
-                        renderDebtors();
-                        alert("Система успешно обнулена!");
+                        renderDebtors(); alert("Система обнулена!");
                     });
                 }
-            } else {
-                alert("Неверный пароль!");
-            }
+            } else { alert("Неверный пароль!"); }
         }
 
         function copyForTelegram() {
-            if (!tgUser) { alert("Отчёты скрыты до авторизации!"); return; }
+            if (!tgUser) { alert("Отчёты скрыты!"); return; }
             const selectedDate = document.getElementById('reportDate').value;
             const submittedOnDate = localSubmitted[selectedDate] || [];
-            const savedComments = localComments[savedComments] || {};
+            const savedComments = localComments[selectedDate] || {};
 
-            let listSдали = [];
-            let listNeСдалиСПричиной = [];
-            let listВообщеНеОтметились = [];
+            let listSдали = []; let listNeСдалиСПричиной = []; let listВообщеНеОтметились = [];
 
             submittedOnDate.forEach(pvz => {
                 const info = savedComments[pvz];
-                if (info && info.status === false) {
-                    listNeСдалиСПричиной.push(`• ${pvz} (Причина: ${info.text || 'не указана'})`);
-                } else {
-                    listSдали.push(pvz);
-                }
+                if (info && info.status === false) { listNeСдалиСПричиной.push(`• ${pvz} (Причина: ${info.text || 'не указана'})`); } 
+                else { listSдали.push(pvz); }
             });
-
-            allPvzList.forEach(pvz => {
-                if (!submittedOnDate.includes(pvz)) {
-                    listВообщеНеОтметились.push(pvz);
-                }
-            });
+            allPvzList.forEach(pvz => { if (!submittedOnDate.includes(pvz)) { listВообщеНеОтметились.push(pvz); } });
 
             let text = `📊 *ОТЧЕТ ПО ИНКАССАЦИИ ЗА ${selectedDate}*\n`;
             text += `🗃 *Выгрузку подготовил:* ${tgUser}\n\n`;
+            text += `✅ *Сдали инкассацию (${listSдали.length}):*\n${listSдали.length > 0 ? listSдали.join(', ') : 'Пока никто не сдал'}\n\n`;
+            text += `⚠️ *Не сдали инкассацию с причиной (${listNeСдалиСПричиной.length}):*\n${listNeСдалиСПричиной.length > 0 ? listNeСдалиСПричиной.join('\n') : 'Таких ПВЗ нет'}\n\n`;
+            text += `🔴 *Вообще не внесли данные (${listВообщеНеОтметились.length}):*\n${listВообщеНеОтметились.length > 0 ? listВообщеНеОтметились.join(', ') : 'Все заполнили отчет! 🎉'}\n`;
 
-            text += `✅ *Сдали инкассацию (${listSдали.length}):*\n`;
-            text += (listSдали.length > 0 ? listSдали.join(', ') : 'Пока никто не сдал') + '\n\n';
-
-            text += `⚠️ *Не сдали инкассацию с указанием причины (${listNeСдалиСПричиной.length}):*\n`;
-            text += (listNeСдалиСПричиной.length > 0 ? listNeСдалиСПричиной.join('\n') : 'Таких ПВЗ нет') + '\n\n';
-
-            text += `🔴 *Вообще не внесли данные на сайт (${listВообщеНеОтметились.length}):*\n`;
-            text += (listВообщеНеОтметились.length > 0 ? listВообщеНеОтметились.join(', ') : 'Все ПВЗ заполнили отчет! 🎉') + '\n';
-
-            var dummy = document.createElement("textarea");
-            document.body.appendChild(dummy);
-            dummy.value = text; dummy.select(); document.execCommand("copy");
-            document.body.removeChild(dummy);
-            alert("Раздельный отчет с причинами не сдачи успешно скопирован!");
+            var dummy = document.createElement("textarea"); document.body.appendChild(dummy);
+            dummy.value = text; dummy.select(); document.execCommand("copy"); document.body.removeChild(dummy);
+            alert("Раздельный отчет успешно скопирован!");
         }
     </script>
 </body>
