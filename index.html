@@ -49,8 +49,8 @@
         .lock-overlay {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(31, 25, 61, 0.85);
-            backdrop-filter: blur(6px);
+            background: rgba(31, 25, 61, 0.9);
+            backdrop-filter: blur(8px);
             border-radius: 24px;
             display: flex;
             flex-direction: column;
@@ -63,12 +63,11 @@
         .lock-overlay-text {
             font-size: 16px;
             font-weight: 700;
-            color: var(--text-muted);
+            color: #FFA4A4;
             margin-bottom: 15px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-
         /* КНОПКА ТЕЛЕГРАМ */
         .tg-login-btn {
             background: var(--tg-blue);
@@ -175,8 +174,6 @@
             color: white;
             margin: 15px 0 5px 0;
         }
-
-        /* ОСТАЛЬНЫЕ БАЗОВЫЕ СТИЛИ СТРАНИЦЫ */
         .clock-widget {
             background: rgba(45, 37, 84, 0.4);
             border: 1px solid rgba(124, 58, 237, 0.2);
@@ -452,8 +449,6 @@
             justify-content: center;
             gap: 8px;
         }
-
-        /* ПОДВАЛ САЙТА (ФУТЕР) С ДОКУМЕНТАМИ */
         .site-footer {
             margin-top: 30px;
             margin-bottom: 10px;
@@ -487,14 +482,13 @@
     <!-- ВЕРХНИЙ БАР ПРОФИЛЯ АВТОРИЗАЦИИ -->
     <div class="container" style="padding: 15px 20px; border-radius: 16px; margin-bottom: 15px;">
         <div id="authStatusBlock">
-            <!-- Сюда скрипт подставит либо кнопку входа, либо никнейм -->
             <div class="lock-overlay-text" style="margin-bottom: 0; font-size: 13px;">Проверка авторизации...</div>
         </div>
     </div>
 
     <!-- КАРТОЧКА ВВОДА ДАННЫХ -->
     <div class="container" id="mainFormCard">
-        <!-- Скрытое окно блокировки, если админ не вошел через ТГ -->
+        <!-- Окно блокировки, если сотрудник не вошел через ТГ -->
         <div class="lock-overlay" id="formLockOverlay">
             <div class="lock-overlay-text">Доступ заблокирован</div>
             <button class="tg-login-btn" onclick="simulateTelegramLogin()">
@@ -565,7 +559,7 @@
         </button>
     </div>
 
-    <!-- МОДНЫЙ ПОДВАЛ (ФУТЕР) С ССЫЛКАМИ -->
+    <!-- ПОДВАЛ (ФУТЕР) С ЮРИДИЧЕСКИМИ ССЫЛКАМИ -->
     <div class="site-footer">
         <div class="footer-links">
             <button class="footer-link" onclick="openModal('privacyModal')">Политика конфиденциальности</button>
@@ -613,10 +607,10 @@
         let secretClickCount = 0;
         let selectedPvzValue = "";
         
-        // Переменная для хранения статуса авторизации Telegram в памяти браузера
+        // Хранилище аккаунта Telegram в постоянной памяти браузера
         let tgUser = localStorage.getItem('uzum_tg_user') || null;
 
-        // Строго 107 уникальных ПВЗ без единого дубликата
+        // Строго 107 уникальных ПВЗ без дубликатов
         const allPvzList = [
             "FrТАШ-160","FrТАШ-166","FrТАШ-167","FrТАШ-169","FrТАШ-171","FrТАШ-175","FrТАШ-176","FrТАШ-179","FrТАШ-181","FrТАШ-184","FrТАШ-185","FrТАШ-187","FrТАШ-188","FrТАШ-189","FrТАШ-192","FrТАШ-195","FrТАШ-196","FrТАШ-198","FrТАШ-200","FrТАШ-203","FrТАШ-205","FrТАШ-206","FrТАШ-208","FrТАШ-213","FrТАШ-215","FrТАШ-219","FrТАШ-220","FrТАШ-225","FrТАШ-227","FrТАШ-230","FrТАШ-232","FrТАШ-237","FrТАШ-239","FrТАШ-243","FrТАШ-247","FrТАШ-250","FrТАШ-251","FrТАШ-258","FrТАШ-261","FrТАШ-265","FrТАШ-266","FrТАШ-269","FrТАШ-271","FrТАШ-275","FrТАШ-277","FrТАШ-282","FrТАШ-283","FrТАШ-284","FrТАШ-285","FrТАШ-286","FrТАШ-287","FrТАШ-292","FrТАШ-293","FrТАШ-296","FrТАШ-297","FrТАШ-298","FrТАШ-304","FrТАШ-309","FrТАШ-310","FrТАШ-317","FrТАШ-318","FrТАШ-321","FrТАШ-322","FrТАШ-323","FrТАШ-325","FrТАШ-330","FrТАШ-331","FrТАШ-332","FrТАШ-333","FrТАШ-335","FrТАШ-336","FrТАШ-337","FrТАШ-338","FrТАШ-339","FrТАШ-341","FrТАШ-342","FrТАШ-347","FrТАШ-352","FrТАШ-353","FrТАШ-355","FrТАШ-365","FrТАШ-369","FrТАШ-370","FrТАШ-373","FrТАШ-376","FrТАШ-378","FrТАШ-379","FrТАШ-389","FrТАШ-393","FrТАШ-395","FrТАШ-397","FrТАШ-398","FrТАШ-401","FrТАШ-406","FrТАШ-407","FrТАШ-409","FrТАШ-411","FrТАШ-412","FrТАШ-414","FrТАШ-415","FrТАШ-417","FrТАШ-418","FrТАШ-419","FrТАШ-428","FrТАШ-429","FrТАШ-439","FrЧИН-9"
         ];
@@ -635,7 +629,6 @@
             document.getElementById('liveDate').innerText = now.toLocaleDateString('ru-RU', options);
         }
 
-        // Управление модальными окнами документов
         function openModal(id) {
             document.getElementById(id).classList.add('open');
         }
@@ -663,14 +656,14 @@
 
             document.getElementById('dropdownTrigger').onclick = function(e) {
                 e.stopPropagation();
-                // Открываем только если пользователь авторизован
                 if (tgUser) {
                     document.getElementById('pvzDropdown').classList.toggle('open');
                 }
             };
 
             document.onclick = function() {
-                document.getElementById('pvzDropdown').classList.remove('open');
+                const dropdown = document.getElementById('pvzDropdown');
+                if (dropdown) dropdown.classList.remove('open');
             };
         }
 
@@ -679,34 +672,7 @@
             document.getElementById('dropdownTrigger').innerText = label;
             document.getElementById('pvzDropdown').classList.remove('open');
         }
-    <script>
-        let formStatus = null;
-        let activeFilter = 'all';
-        let secretClickCount = 0;
-        let selectedPvzValue = "";
-        
-        // Хранилище аккаунта Telegram в памяти браузера
-        let tgUser = localStorage.getItem('uzum_tg_user') || null;
-
-        // Строго 107 уникальных ПВЗ без единого дубликата
-        const allPvzList = [
-            "FrТАШ-160","FrТАШ-166","FrТАШ-167","FrТАШ-169","FrТАШ-171","FrТАШ-175","FrТАШ-176","FrТАШ-179","FrТАШ-181","FrТАШ-184","FrТАШ-185","FrТАШ-187","FrТАШ-188","FrТАШ-189","FrТАШ-192","FrТАШ-195","FrТАШ-196","FrТАШ-198","FrТАШ-200","FrТАШ-203","FrТАШ-205","FrТАШ-206","FrТАШ-208","FrТАШ-213","FrТАШ-215","FrТАШ-219","FrТАШ-220","FrТАШ-225","FrТАШ-227","FrТАШ-230","FrТАШ-232","FrТАШ-237","FrТАШ-239","FrТАШ-243","FrТАШ-247","FrТАШ-250","FrТАШ-251","FrТАШ-258","FrТАШ-261","FrТАШ-265","FrТАШ-266","FrТАШ-269","FrТАШ-271","FrТАШ-275","FrТАШ-277","FrТАШ-282","FrТАШ-283","FrТАШ-284","FrТАШ-285","FrТАШ-286","FrТАШ-287","FrТАШ-292","FrТАШ-293","FrТАШ-296","FrТАШ-297","FrТАШ-298","FrТАШ-304","FrТАШ-309","FrТАШ-310","FrТАШ-317","FrТАШ-318","FrТАШ-321","FrТАШ-322","FrТАШ-323","FrТАШ-325","FrТАШ-330","FrТАШ-331","FrТАШ-332","FrТАШ-333","FrТАШ-335","FrТАШ-336","FrТАШ-337","FrТАШ-338","FrТАШ-339","FrТАШ-341","FrТАШ-342","FrТАШ-347","FrТАШ-352","FrТАШ-353","FrТАШ-355","FrТАШ-365","FrТАШ-369","FrТАШ-370","FrТАШ-373","FrТАШ-376","FrТАШ-378","FrТАШ-379","FrТАШ-389","FrТАШ-393","FrТАШ-395","FrТАШ-397","FrТАШ-398","FrТАШ-401","FrТАШ-406","FrТАШ-407","FrТАШ-409","FrТАШ-411","FrТАШ-412","FrТАШ-414","FrТАШ-415","FrТАШ-417","FrТАШ-418","FrТАШ-419","FrТАШ-428","FrТАШ-429","FrТАШ-439","FrЧИН-9"
-        ];
-
-        let localSubmitted = JSON.parse(localStorage.getItem('uzum_inkas_data')) || {};
-        let localComments = JSON.parse(localStorage.getItem('uzum_inkas_comments')) || {};
-        function updateClock() {
-            const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-            document.getElementById('liveClock').innerText = `${hours}:${minutes}:${seconds}`;
-            
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('liveDate').innerText = now.toLocaleDateString('ru-RU', options);
-        }
-
-        // Проверка авторизации и переключение блокировок
+        // Проверка авторизации и переключение шторки блокировки
         function updateAuthUI() {
             const authBlock = document.getElementById('authStatusBlock');
             const formOverlay = document.getElementById('formLockOverlay');
@@ -758,49 +724,6 @@
                 renderDebtors();
             }
         }
-        function openModal(id) {
-            document.getElementById(id).classList.add('open');
-        }
-        function closeModal(id) {
-            document.getElementById(id).classList.remove('open');
-        }
-
-        function buildCustomDropdown() {
-            const optionsContainer = document.getElementById('dropdownOptions');
-            optionsContainer.innerHTML = "";
-
-            const defaultOpt = document.createElement('div');
-            defaultOpt.className = 'custom-option';
-            defaultOpt.innerText = "-- Выберите ПВЗ --";
-            defaultOpt.onclick = function() { selectCustomOption("", "-- Выберите ПВЗ --"); };
-            optionsContainer.appendChild(defaultOpt);
-
-            allPvzList.forEach(pvz => {
-                const opt = document.createElement('div');
-                opt.className = 'custom-option';
-                opt.innerText = pvz;
-                opt.onclick = function() { selectCustomOption(pvz, pvz); };
-                optionsContainer.appendChild(opt);
-            });
-
-            document.getElementById('dropdownTrigger').onclick = function(e) {
-                e.stopPropagation();
-                if (tgUser) {
-                    document.getElementById('pvzDropdown').classList.toggle('open');
-                }
-            };
-
-            document.onclick = function() {
-                document.getElementById('pvzDropdown').classList.remove('open');
-            };
-        }
-
-        function selectCustomOption(value, label) {
-            selectedPvzValue = value;
-            document.getElementById('dropdownTrigger').innerText = label;
-            document.getElementById('pvzDropdown').classList.remove('open');
-        }
-
         window.onload = function() {
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('reportDate').value = today;
@@ -857,7 +780,6 @@
             document.getElementById('chipNone').classList.toggle('active-chip', type === 'none');
             renderDebtors();
         }
-
         function renderDebtors() {
             const selectedDate = document.getElementById('reportDate').value;
             const container = document.getElementById('debtorsList');
@@ -915,7 +837,7 @@
         }
 
         function sendData() {
-            // КРИТИЧЕСКАЯ БЛОКИРОВКА БЕЗОПАСНОСТИ
+            // КРИТИЧЕСКАЯ БЛОКИРОВКА СОХРАНЕНИЯ ДЛЯ ГОСТЕЙ
             if (!tgUser) { 
                 alert("Критическая ошибка защиты! Сохранение логов заблокировано. Пожалуйста, войдите в свой рабочий аккаунт Telegram."); 
                 return; 
@@ -931,7 +853,7 @@
 
             const webAppUrl = "https://google.com";
             
-            // Автоматически добавляем к комментарию ПВЗ никнейм автора из ТГ
+            // Автоматически добавляем никнейм автора к отправляемому комментарию
             const payload = { pvz: pvz, status: formStatus, comment: comment + ` (Автор: ${tgUser})`, totalSum: 0 };
 
             fetch(webAppUrl, {
@@ -1031,4 +953,3 @@
     </script>
 </body>
 </html>
-
