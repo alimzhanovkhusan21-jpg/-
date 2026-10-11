@@ -829,7 +829,7 @@
             document.getElementById('authPhoneBtn').innerText = "Получить код в Telegram";
             isCodeSent = false;
         }
-        // НАСТОЯЩАЯ ОТПРАВКА И ПРОВЕРКА КОДОВ ЧЕРЕЗ ВАШ СЕРВЕР GOOGLE
+        // НАСТОЯЩАЯ ОТПРАВКА И ПРОВЕРКА КОДОВ ЧЕРЕЗ ВАШ СЕРВЕР GOOGLE С ОБХОДОМ БЛОКИРОВКИ CORS
         function submitAuth(type) {
             if (type === 'nick') {
                 let nickField = document.getElementById('authTelegramNick').value;
@@ -852,8 +852,11 @@
                     document.getElementById('authPhoneBtn').innerText = "Отправка запроса...";
                     document.getElementById('authPhoneBtn').disabled = true;
 
+                    // Настройка сетевого запроса с полным обходом ограничений CORS
                     fetch(webAppUrl, {
                         method: 'POST',
+                        mode: 'cors',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                         body: JSON.stringify({ action: "REQUEST_CODE", phone: fullPhone })
                     })
                     .then(res => res.json())
@@ -874,7 +877,7 @@
                     .catch(err => {
                         document.getElementById('authPhoneBtn').disabled = false;
                         document.getElementById('authPhoneBtn').innerText = "Получить код в Telegram";
-                        alert("Ошибка соединения с сервером Google!");
+                        alert("Ошибка соединения с сервером Google! Проверьте, что в Apps Script доступ открыт для 'Все'.");
                     });
                 } else {
                     let codeField = document.getElementById('authTelegramCode').value;
@@ -885,6 +888,8 @@
 
                     fetch(webAppUrl, {
                         method: 'POST',
+                        mode: 'cors',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                         body: JSON.stringify({ action: "VERIFY_CODE", phone: fullPhone, code: codeField.trim() })
                     })
                     .then(res => res.json())
@@ -936,7 +941,7 @@
                 if (normalized === "@frtash192" || normalized === "+998331010516" || 
                     normalized === "@khusan_alimzhanov" || normalized === "+998940108318") {
                     badgeClass = "admin";
-                    badgeText = "Админ 👑";
+                    badgeText = "Admin 👑";
                 } else if (normalized === "@ps_sergeevna" || normalized === "+998933433593") {
                     badgeClass = "tu";
                     badgeText = "ТУ 🚀";
@@ -1010,7 +1015,7 @@
         }
 
         window.onload = function() {
-            const today = new Date().toISOString().split('T');
+            const today = new Date().toISOString().split('T')[0];
             document.getElementById('reportDate').value = today;
             
             updateClock();
@@ -1049,7 +1054,7 @@
                 todayBtn.classList.add('active-date');
                 yesterdayBtn.classList.remove('active-date');
             }
-            dateInput.value = targetDate.toISOString().split('T');
+            dateInput.value = targetDate.toISOString().split('T')[0];
             renderDebtors();
         }
 
