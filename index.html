@@ -1025,7 +1025,7 @@
         }
 
         // КРИТИЧЕСКАЯ ФУНКЦИЯ ДЛЯ СКАЧИВАНИЯ ДАННЫХ ОТ КОЛЛЕГ ИЗ GOOGLE ТАБЛИЦЫ
-        function syncReportsFromGoogle() {
+               function syncReportsFromGoogle() {
             const selectedDate = document.getElementById('reportDate').value;
             if (!selectedDate || !tgUser) return;
 
@@ -1037,14 +1037,25 @@
             })
             .then(res => res.json())
             .then(data => {
-                if (data && data.success) {
-                    localSubmitted[selectedDate] = data.submitted || [];
-                    localComments[selectedDate] = data.comments || {};
+                if (data && data.success && data.submitted && data.submitted.length > 0) {
+                    // Объединяем то, что пришло от коллег, с тем, что ввели вы
+                    if (!localSubmitted[selectedDate]) localSubmitted[selectedDate] = [];
+                    
+                    data.submitted.forEach(pvz => {
+                        if (!localSubmitted[selectedDate].includes(pvz)) {
+                            localSubmitted[selectedDate].push(pvz);
+                        }
+                    });
+
+                    if (!localComments[selectedDate]) localComments[selectedDate] = {};
+                    localComments[selectedDate] = Object.assign({}, data.comments, localComments[selectedDate]);
+                    
                     renderDebtors();
                 }
             })
-            .catch(err => console.log("Синхронизация данных с таблицей..."));
+            .catch(err => console.log("Фоновое обновление баз..."));
         }
+
 
         window.onload = function() {
             const today = new Date().toISOString().split('T')[0];
