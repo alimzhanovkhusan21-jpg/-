@@ -624,7 +624,7 @@
         </div>
     </div>
 
-    <!-- КАРТОЧКА ВВОДД ДАННЫХ -->
+    <!-- КАРТОЧКА ВВОДА ДАННЫХ -->
     <div class="container" id="mainFormCard">
         <!-- Окно блокировки, если сотрудник не вошел -->
         <div class="lock-overlay" id="formLockOverlay">
@@ -702,7 +702,7 @@
             <span style="color: rgba(255,255,255,0.1);">|</span>
             <button class="footer-link" onclick="openModal('consentModal')">Согласие на обработку данных</button>
         </div>
-        <div>© Uzum, 2026 · Контур Безопасности SLA · Версия 2.7</div>
+        <div>© Uzum, 2026 · Контур Безопасности SLA · Версия 2.8</div>
     </div>
 
     <!-- КРАСИВОЕ ОКНО ВХОДА ТЕЛЕГРАМ ПО ЦЕНТРУ -->
@@ -935,7 +935,7 @@
             localStorage.setItem('uzum_tg_user', tgUser);
             closeAuthModal();
             updateAuthUI();
-            renderDebtors();
+            syncReportsFromGoogle();
             alert(`Успешный вход в систему! Вы авторизованы под именем: ${tgUser}`);
         }
         function updateAuthUI() {
@@ -983,7 +983,7 @@
         }
 
         function logoutTelegram() {
-            if (confirm("Вы уверены, что хотите退出? Ввод отчётов будет заблокирован.")) {
+            if (confirm("Вы уверены, что хотите выйти? Ввод отчётов будет заблокирован.")) {
                 tgUser = null;
                 localStorage.removeItem('uzum_tg_user');
                 updateAuthUI();
@@ -1024,12 +1024,14 @@
             document.getElementById('pvzDropdown').classList.remove('open');
         }
 
-        // Автоматическое скачивание общей базы данных отчетов из Google Таблицы
+        // КРИТИЧЕСКАЯ ФУНКЦИЯ ДЛЯ СКАЧИВАНИЯ ДАННЫХ ОТ КОЛЛЕГ ИЗ GOOGLE ТАБЛИЦЫ
         function syncReportsFromGoogle() {
             const selectedDate = document.getElementById('reportDate').value;
             if (!selectedDate || !tgUser) return;
 
-            fetch(`${webAppUrl}?action=GET_REPORTS&date=${selectedDate}`, {
+            const targetUrl = webAppUrl + "?action=GET_REPORTS&date=" + selectedDate;
+
+            fetch(targetUrl, {
                 method: 'GET',
                 mode: 'cors'
             })
@@ -1041,7 +1043,7 @@
                     renderDebtors();
                 }
             })
-            .catch(err => console.log("Фоновое обновление баз..."));
+            .catch(err => console.log("Синхронизация данных с таблицей..."));
         }
 
         window.onload = function() {
@@ -1063,7 +1065,6 @@
                 });
             }
             
-            // Запуск полной синхронизации данных при первом входе на сайт
             syncReportsFromGoogle();
         };
         function setFormStatus(status) {
@@ -1155,7 +1156,7 @@
             
             if(!pvz) { alert("Выберите ПВЗ!"); return; }
             if(formStatus === null) { alert("Выберите статус!"); return; }
-            if(formStatus === false && !comment.trim()) { alert("Укажите причину не сдачи!"); return; }
+            if(formStatus === false && !comment.trim()) { alert("Укажите цену/причину не сдачи!"); return; }
 
             let roleLabel = "Администратор ПВЗ";
             const currentRole = checkUserRole();
@@ -1180,7 +1181,7 @@
                 localComments[selectedDate][pvz] = { status: formStatus, text: comment };
                 
                 renderDebtors(); resetAll();
-                // Сразу же принудительно стягиваем обновленную общую базу с сервера
+                // Принудительно стягиваем обновленную общую базу с сервера для синхронизации
                 setTimeout(syncReportsFromGoogle, 1500);
             })
             .catch(error => { alert("Ошибка отправки: " + error); });
