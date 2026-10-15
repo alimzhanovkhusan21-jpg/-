@@ -1057,10 +1057,14 @@
         }
 
 
-        window.onload = function() {
+               window.onload = function() {
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('reportDate').value = today;
             
+            // Восстанавливаем сохраненные данные из памяти устройства, чтобы избежать сброса
+            localSubmitted = JSON.parse(localStorage.getItem('uzum_inkas_local_data')) || {};
+            localComments = JSON.parse(localStorage.getItem('uzum_inkas_local_comments')) || {};
+
             updateClock();
             setInterval(updateClock, 1000);
             buildCustomDropdown();
@@ -1076,8 +1080,10 @@
                 });
             }
             
+            renderDebtors();
             syncReportsFromGoogle();
         };
+
         function setFormStatus(status) {
             if (!tgUser) { alert("Вы не авторизованы через Telegram!"); return; }
             formStatus = status;
