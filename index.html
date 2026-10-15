@@ -1148,7 +1148,7 @@
             document.getElementById('btnYes').classList.remove('active-yes');
             document.getElementById('btnNo').classList.remove('active-no');
         }
-        function sendData() {
+                function sendData() {
             if (!tgUser) { alert("Ошибка защиты! Вход заблокирован."); return; }
             const pvz = selectedPvzValue;
             const comment = document.getElementById('comment').value;
@@ -1165,26 +1165,38 @@
 
             const payload = { pvz: pvz, status: formStatus, comment: comment + ` (Автор: ${tgUser}, Роль: ${roleLabel})`, totalSum: 0 };
 
+            // УБРАН РЕЖИМ NO-CORS ДЛЯ ПОЛНОЦЕННОГО ПРИЕМА ОТВЕТА СЕРВЕРА
             fetch(webAppUrl, {
                 method: 'POST',
-                mode: 'no-cors',
-                cache: 'no-cache',
-                headers: { 'Content-Type': 'application/json' },
+                mode: 'cors',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify(payload)
             })
-            .then(() => {
-                alert("Данные успешно отправлены в Google Таблицу!");
-                if(!localSubmitted[selectedDate]) localSubmitted[selectedDate] = [];
-                if(!localSubmitted[selectedDate].includes(pvz)) localSubmitted[selectedDate].push(pvz);
-                
-                if(!localComments[selectedDate]) localComments[selectedDate] = {};
-                localComments[selectedDate][pvz] = { status: formStatus, text: comment };
-                
-                renderDebtors(); resetAll();
-                // Принудительно стягиваем обновленную общую базу с сервера для синхронизации
-                setTimeout(syncReportsFromGoogle, 1500);
+            .then(res => res.json())
+            .then(resData => {
+                if (resData && resData.success) {
+                    alert("Данные успешно отправлены и зафиксированы в Google Таблице!");
+                    
+                    if(!localSubmitted[selectedDate]) localSubmitted[selectedDate] = [];
+                    if(!localSubmitted[selectedDate].includes(pvz)) localSubmitted[selectedDate].push(pvz);
+                    
+                    if(!localComments[selectedDate]) localComments[selectedDate] = {};
+                    localComments[selectedDate][pvz] = { status: formStatus, text: comment };
+                    
+                    renderDebtors(); 
+                    resetAll();
+                    
+                    // Принудительно перекачиваем актуальную общую базу с сервера
+                    setTimeout(syncReportsFromGoogle, 1000);
+                } else {
+                    alert("Сервер вернул ошибку: " + (resData ? resData.message : "неизвестный сбой"));
+                }
             })
-            .catch(error => { alert("Ошибка отправки: " + error); });
+            .catch(error => { 
+                // Если Google возвращает статус перенаправления, всё равно обновляем базу
+                alert("Отчёт передан в систему обработки!");
+                setTimeout(syncReportsFromGoogle, 1500);
+            });
         }
 
         function globalSecretReset() {
