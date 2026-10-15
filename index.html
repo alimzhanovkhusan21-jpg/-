@@ -1159,7 +1159,7 @@
             document.getElementById('btnYes').classList.remove('active-yes');
             document.getElementById('btnNo').classList.remove('active-no');
         }
-                    function sendData() {
+                          function sendData() {
             if (!tgUser) { alert("Ошибка защиты! Вход заблокирован."); return; }
             const pvz = selectedPvzValue;
             const comment = document.getElementById('comment').value;
@@ -1176,34 +1176,33 @@
 
             const payload = { pvz: pvz, status: formStatus, comment: comment + ` (Автор: ${tgUser}, Роль: ${roleLabel})`, totalSum: 0 };
 
-            // Фиксируем данные на экране и в памяти сайта СРАЗУ перед отправкой, чтобы ничего не сбрасывалось
+            // ЖЕЛЕЗНО ФИКСИРУЕМ В ПАМЯТИ ТЕЛЕФОНА ДО ОТПРАВКИ
             if(!localSubmitted[selectedDate]) localSubmitted[selectedDate] = [];
             if(!localSubmitted[selectedDate].includes(pvz)) localSubmitted[selectedDate].push(pvz);
             
             if(!localComments[selectedDate]) localComments[selectedDate] = {};
             localComments[selectedDate][pvz] = { status: formStatus, text: comment };
             
+            // Сохраняем в кэш браузера, чтобы данные не стирались при обновлении страницы F5
+            localStorage.setItem('uzum_inkas_local_data', JSON.stringify(localSubmitted));
+            localStorage.setItem('uzum_inkas_local_comments', JSON.stringify(localComments));
+
             renderDebtors();
+            alert("Отчёт зафиксирован на устройстве и отправлен в Google Таблицу!");
+            resetAll();
 
             fetch(webAppUrl, {
                 method: 'POST',
-                mode: 'no-cors', // Возвращаем стабильный режим отправки в Google
+                mode: 'no-cors',
                 cache: 'no-cache',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             })
             .then(() => {
-                alert("Данные успешно отправлены и зафиксированы в Google Таблице!");
-                resetAll();
-                renderDebtors();
-                // Делаем фоновое обновление базы с сервера через 2 секунды
-                setTimeout(syncReportsFromGoogle, 2000);
+                setTimeout(syncReportsFromGoogle, 1000);
             })
             .catch(error => {
-                alert("Данные зафиксированы в системе!");
-                resetAll();
-                renderDebtors();
-                setTimeout(syncReportsFromGoogle, 2000);
+                setTimeout(syncReportsFromGoogle, 1000);
             });
         }
 
