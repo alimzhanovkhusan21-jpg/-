@@ -624,7 +624,7 @@
         </div>
     </div>
 
-    <!-- КАРТОЧКА ВВОДА ДАННЫХ -->
+    <!-- КАРТОЧКА ВВОДД ДАННЫХ -->
     <div class="container" id="mainFormCard">
         <!-- Окно блокировки, если сотрудник не вошел -->
         <div class="lock-overlay" id="formLockOverlay">
@@ -702,7 +702,7 @@
             <span style="color: rgba(255,255,255,0.1);">|</span>
             <button class="footer-link" onclick="openModal('consentModal')">Согласие на обработку данных</button>
         </div>
-        <div>© Uzum, 2026 · Контур Безопасности SLA · Версия 2.6</div>
+        <div>© Uzum, 2026 · Контур Безопасности SLA · Версия 2.7</div>
     </div>
 
     <!-- КРАСИВОЕ ОКНО ВХОДА ТЕЛЕГРАМ ПО ЦЕНТРУ -->
@@ -781,9 +781,8 @@
         let authMode = "nick"; 
         let isCodeSent = false; 
         
-        // Адрес вашего живого Google-сервера авторизации и сохранения данных (Версия 8)
-        const webAppUrl = "https://script.google.com/macros/s/AKfycbxl7OOyLzFBnNPZAtIzGdjNfYZsccwHlxZTMbez4mulgxQZ-jPqJYVkyLPvARZPyzBq4Q/exec";
-
+        // Рабочий адрес вашей Версии 11 Google-сервера авторизации и сохранения данных
+        const webAppUrl = "https://google.com";
 
         // Постоянная память аккаунта в браузере
         let tgUser = localStorage.getItem('uzum_tg_user') || null;
@@ -793,8 +792,19 @@
             "FrТАШ-160","FrТАШ-166","FrТАШ-167","FrТАШ-169","FrТАШ-171","FrТАШ-175","FrТАШ-176","FrТАШ-179","FrТАШ-181","FrТАШ-184","FrТАШ-185","FrТАШ-187","FrТАШ-188","FrТАШ-189","FrТАШ-192","FrТАШ-195","FrТАШ-196","FrТАШ-198","FrТАШ-200","FrТАШ-203","FrТАШ-205","FrТАШ-206","FrТАШ-208","FrТАШ-213","FrТАШ-215","FrТАШ-219","FrТАШ-220","FrТАШ-225","FrТАШ-227","FrТАШ-230","FrТАШ-232","FrТАШ-237","FrТАШ-239","FrТАШ-243","FrТАШ-247","FrТАШ-250","FrТАШ-251","FrТАШ-258","FrТАШ-261","FrТАШ-265","FrТАШ-266","FrТАШ-269","FrТАШ-271","FrТАШ-275","FrТАШ-277","FrТАШ-282","FrТАШ-283","FrТАШ-284","FrТАШ-285","FrТАШ-286","FrТАШ-287","FrТАШ-292","FrТАШ-293","FrТАШ-296","FrТАШ-297","FrТАШ-298","FrТАШ-304","FrТАШ-309","FrТАШ-310","FrТАШ-317","FrТАШ-318","FrТАШ-321","FrТАШ-322","FrТАШ-323","FrТАШ-325","FrТАШ-330","FrТАШ-331","FrТАШ-332","FrТАШ-333","FrТАШ-335","FrТАШ-336","FrТАШ-337","FrТАШ-338","FrТАШ-339","FrТАШ-341","FrТАШ-342","FrТАШ-347","FrТАШ-352","FrТАШ-353","FrТАШ-355","FrТАШ-365","FrТАШ-369","FrТАШ-370","FrТАШ-373","FrТАШ-376","FrТАШ-378","FrТАШ-379","FrТАШ-389","FrТАШ-393","FrТАШ-395","FrТАШ-397","FrТАШ-398","FrТАШ-401","FrТАШ-406","FrТАШ-407","FrТАШ-409","FrТАШ-411","FrТАШ-412","FrТАШ-414","FrТАШ-415","FrТАШ-417","FrТАШ-418","FrТАШ-419","FrТАШ-428","FrТАШ-429","FrТАШ-439","FrЧИН-9"
         ];
 
-        let localSubmitted = JSON.parse(localStorage.getItem('uzum_inkas_data')) || {};
-        let localComments = JSON.parse(localStorage.getItem('uzum_inkas_comments')) || {};
+        let localSubmitted = {};
+        let localComments = {};
+
+        function checkUserRole() {
+            if (!tgUser) return "none";
+            let normalized = tgUser.toLowerCase().replace(/\s+/g, '');
+            if (normalized === "@frtash192" || normalized === "+998331010516" || normalized === "@khusan_alimzhanov" || normalized === "+998940108318") {
+                return "admin";
+            } else if (normalized === "@ps_sergeevna" || normalized === "+998933433593") {
+                return "tu";
+            }
+            return "staff";
+        }
 
         function updateClock() {
             const now = new Date();
@@ -809,7 +819,6 @@
 
         function openModal(id) { document.getElementById(id).classList.add('open'); }
         function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-
         function openAuthModal() { document.getElementById('customAuthModal').classList.add('open'); }
         function closeAuthModal() { document.getElementById('customAuthModal').classList.remove('open'); }
 
@@ -974,7 +983,7 @@
         }
 
         function logoutTelegram() {
-            if (confirm("Вы уверены, что хотите выйти? Ввод отчётов будет заблокирован.")) {
+            if (confirm("Вы уверены, что хотите退出? Ввод отчётов будет заблокирован.")) {
                 tgUser = null;
                 localStorage.removeItem('uzum_tg_user');
                 updateAuthUI();
@@ -1015,9 +1024,29 @@
             document.getElementById('pvzDropdown').classList.remove('open');
         }
 
+        // Автоматическое скачивание общей базы данных отчетов из Google Таблицы
+        function syncReportsFromGoogle() {
+            const selectedDate = document.getElementById('reportDate').value;
+            if (!selectedDate || !tgUser) return;
+
+            fetch(`${webAppUrl}?action=GET_REPORTS&date=${selectedDate}`, {
+                method: 'GET',
+                mode: 'cors'
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.success) {
+                    localSubmitted[selectedDate] = data.submitted || [];
+                    localComments[selectedDate] = data.comments || {};
+                    renderDebtors();
+                }
+            })
+            .catch(err => console.log("Фоновое обновление баз..."));
+        }
+
         window.onload = function() {
-            const today = new Date().toISOString().split('T');
-            document.getElementById('reportDate').value = today[0];
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('reportDate').value = today;
             
             updateClock();
             setInterval(updateClock, 1000);
@@ -1033,7 +1062,9 @@
                     setTimeout(() => { secretClickCount = 0; }, 2000);
                 });
             }
-            renderDebtors();
+            
+            // Запуск полной синхронизации данных при первом входе на сайт
+            syncReportsFromGoogle();
         };
         function setFormStatus(status) {
             if (!tgUser) { alert("Вы не авторизованы через Telegram!"); return; }
@@ -1056,13 +1087,13 @@
                 yesterdayBtn.classList.remove('active-date');
             }
             dateInput.value = targetDate.toISOString().split('T')[0];
-            renderDebtors();
+            syncReportsFromGoogle();
         }
 
         function loadReport() {
             document.getElementById('dateToday').classList.remove('active-date');
             document.getElementById('dateYesterday').classList.remove('active-date');
-            renderDebtors();
+            syncReportsFromGoogle();
         }
 
         function setFilter(type) {
@@ -1127,12 +1158,9 @@
             if(formStatus === false && !comment.trim()) { alert("Укажите причину не сдачи!"); return; }
 
             let roleLabel = "Администратор ПВЗ";
-            let normalized = tgUser.toLowerCase().replace(/\s+/g, '');
-            if (normalized === "@frtash192" || normalized === "+998331010516" || normalized === "@khusan_alimzhanov" || normalized === "+998940108318") {
-                roleLabel = "Админ";
-            } else if (normalized === "@ps_sergeevna" || normalized === "+998933433593") {
-                roleLabel = "ТУ";
-            }
+            const currentRole = checkUserRole();
+            if (currentRole === "admin") roleLabel = "Админ";
+            else if (currentRole === "tu") roleLabel = "ТУ";
 
             const payload = { pvz: pvz, status: formStatus, comment: comment + ` (Автор: ${tgUser}, Роль: ${roleLabel})`, totalSum: 0 };
 
@@ -1147,27 +1175,26 @@
                 alert("Данные успешно отправлены в Google Таблицу!");
                 if(!localSubmitted[selectedDate]) localSubmitted[selectedDate] = [];
                 if(!localSubmitted[selectedDate].includes(pvz)) localSubmitted[selectedDate].push(pvz);
-                localStorage.setItem('uzum_inkas_data', JSON.stringify(localSubmitted));
-
+                
                 if(!localComments[selectedDate]) localComments[selectedDate] = {};
                 localComments[selectedDate][pvz] = { status: formStatus, text: comment };
-                localStorage.setItem('uzum_inkas_comments', JSON.stringify(localComments));
+                
                 renderDebtors(); resetAll();
+                // Сразу же принудительно стягиваем обновленную общую базу с сервера
+                setTimeout(syncReportsFromGoogle, 1500);
             })
             .catch(error => { alert("Ошибка отправки: " + error); });
         }
 
         function globalSecretReset() {
             if (!tgUser) { alert("Требуется авторизация!"); return; }
+            if (checkUserRole() !== "admin") { alert("Доступ запрещен!"); return; }
             let pass = prompt("Введите пароль администратора:");
             if (pass === "1111") {
                 if (confirm("ВНИМАНИЕ! Это действие сотрет ВСЕ данные за этот день.")) {
                     fetch(webAppUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "CLEAR_ALL" }) })
                     .then(() => {
-                        const selectedDate = document.getElementById('reportDate').value;
                         localSubmitted[selectedDate] = []; localComments[selectedDate] = {};
-                        localStorage.setItem('uzum_inkas_data', JSON.stringify(localSubmitted));
-                        localStorage.setItem('uzum_inkas_comments', JSON.stringify(localComments));
                         renderDebtors(); alert("Система обнулена!");
                     });
                 }
@@ -1176,6 +1203,14 @@
 
         function copyForTelegram() {
             if (!tgUser) { alert("Отчёты скрыты!"); return; }
+            
+            // ЖЕСТКАЯ ПРОВЕРКА РОЛИ ДЛЯ КОПИРОВАНИЯ СВОДКИ
+            const userRole = checkUserRole();
+            if (userRole !== "admin" && userRole !== "tu") {
+                alert("🔒 Доступ заблокирован! Копировать сводную информацию для Telegram разрешено только Администраторам и ТУ.");
+                return;
+            }
+
             const selectedDate = document.getElementById('reportDate').value;
             const submittedOnDate = localSubmitted[selectedDate] || [];
             const savedComments = localComments[selectedDate] || {};
@@ -1197,7 +1232,7 @@
 
             var dummy = document.createElement("textarea"); document.body.appendChild(dummy);
             dummy.value = text; dummy.select(); document.execCommand("copy"); document.body.removeChild(dummy);
-            alert("Раздельный отчет успешно скопирован!");
+            alert("Раздельный отчет успешно скопирован в буфер обмена!");
         }
     </script>
 </body>
