@@ -1237,20 +1237,64 @@ function setQuickDate(mode) {
         }
 
 
-        function globalSecretReset() {
-            if (!tgUser) { alert("Требуется авторизация!"); return; }
-            if (checkUserRole() !== "admin") { alert("Доступ запрещен!"); return; }
-            let pass = prompt("Введите пароль администратора:");
-            if (pass === "1111") {
-                if (confirm("ВНИМАНИЕ! Это действие сотрет ВСЕ данные за этот день.")) {
-                    fetch(webAppUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "CLEAR_ALL" }) })
-                    .then(() => {
-                        localSubmitted[selectedDate] = []; localComments[selectedDate] = {};
-                        renderDebtors(); alert("Система обнулена!");
-                    });
-                }
-            } else { alert("Неверный пароль!"); }
-        }
+       
+function globalSecretReset() {
+    if (!tgUser) {
+        alert("Требуется авторизация!");
+        return;
+    }
+
+    const userRole = checkUserRole();
+
+    if (userRole !== "admin" && userRole !== "tu") {
+        alert("Доступ запрещён!");
+        return;
+    }
+
+    const pass = prompt("Введите пароль администратора:");
+
+    if (pass !== "1111") {
+        alert("Неверный пароль!");
+        return;
+    }
+
+    const dateInput = document.getElementById('reportDate');
+    const dateToClear = dateInput.value;
+
+    if (!dateToClear) {
+        alert("Сначала выберите дату отчёта!");
+        return;
+    }
+
+    if (!confirm(
+        `Удалить отчёты только за ${dateToClear}? Данные за остальные дни останутся.`
+    )) {
+        return;
+    }
+
+    fetch(webAppUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: JSON.stringify({
+            action: "CLEAR_ALL",
+            date: dateToClear,
+            user: tgUser,
+            role: userRole,
+            password: pass
+        })
+    })
+    .then(() => {
+        localSubmitted[dateToClear] = [];
+        localComments[dateToClear] = {};
+        renderDebtors();
+
+        alert("Команда отправлена. Проверьте отчёты за выбранную дату.");
+    })
+    .catch(() => {
+        alert("Не удалось отправить команду сброса.");
+    });
+}
+
 
         function copyForTelegram() {
             if (!tgUser) { alert("Отчёты скрыты!"); return; }
