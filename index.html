@@ -1090,22 +1090,47 @@
             document.getElementById('btnNo').classList.toggle('active-no', !status);
         }
 
-        function setQuickDate(mode) {
-            const todayBtn = document.getElementById('dateToday');
-            const yesterdayBtn = document.getElementById('dateYesterday');
-            const dateInput = document.getElementById('reportDate');
-            let targetDate = new Date();
-            if(mode === 'yesterday') {
-                targetDate.setDate(targetDate.getDate() - 1);
-                yesterdayBtn.classList.add('active-date');
-                todayBtn.classList.remove('active-date');
-            } else {
-                todayBtn.classList.add('active-date');
-                yesterdayBtn.classList.remove('active-date');
-            }
-            dateInput.value = targetDate.toISOString().split('T')[0];
-            syncReportsFromGoogle();
-        }
+        
+function getTashkentDate() {
+    const parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Asia/Tashkent',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    }).formatToParts(new Date());
+
+    const values = {};
+    parts.forEach(part => {
+        if (part.type !== 'literal') values[part.type] = part.value;
+    });
+
+    return `${values.year}-${values.month}-${values.day}`;
+}
+
+function setQuickDate(mode) {
+    const todayBtn = document.getElementById('dateToday');
+    const yesterdayBtn = document.getElementById('dateYesterday');
+    const dateInput = document.getElementById('reportDate');
+
+    let targetDate = getTashkentDate();
+
+    if (mode === 'yesterday') {
+        const [year, month, day] = targetDate.split('-').map(Number);
+        targetDate = new Date(Date.UTC(year, month - 1, day - 1))
+            .toISOString().split('T')[0];
+
+        yesterdayBtn.classList.add('active-date');
+        todayBtn.classList.remove('active-date');
+    } else {
+        todayBtn.classList.add('active-date');
+        yesterdayBtn.classList.remove('active-date');
+    }
+
+    dateInput.value = targetDate;
+    syncReportsFromGoogle();
+    renderDebtors();
+}
+
 
         function loadReport() {
             document.getElementById('dateToday').classList.remove('active-date');
