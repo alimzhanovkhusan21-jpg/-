@@ -1285,6 +1285,31 @@ function setQuickDate(mode) {
             dummy.value = text; dummy.select(); document.execCommand("copy"); document.body.removeChild(dummy);
             alert("Раздельный отчет успешно скопирован в буфер обмена!");
         }
+        
+let lastCheckedTashkentDate = getTashkentDate();
+
+setInterval(() => {
+    const today = getTashkentDate();
+
+    if (today !== lastCheckedTashkentDate) {
+        lastCheckedTashkentDate = today;
+
+        const dateInput = document.getElementById('reportDate');
+
+        if (!dateInput.value ||
+            dateInput.value === getPreviousTashkentDate(today)) {
+            setQuickDate('today');
+        }
+    }
+}, 15000);
+
+function getPreviousTashkentDate(dateString) {
+    const [year, month, day] = dateString.split('-').map(Number);
+
+    return new Date(Date.UTC(year, month - 1, day - 1))
+        .toISOString().split('T')[0];
+}
+
     </script>
 </body>
 </html>
