@@ -1254,10 +1254,9 @@ function globalSecretReset() {
 
     const pass = prompt("Введите пароль администратора:");
 
-    if (pass !== "1111") {
-        alert("Неверный пароль!");
-        return;
-    }
+    if (!pass) {
+    return;
+}
 
     const dateInput = document.getElementById('reportDate');
     const dateToClear = dateInput.value;
