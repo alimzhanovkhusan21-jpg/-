@@ -1238,6 +1238,7 @@ function setQuickDate(mode) {
 
 
        
+
 function globalSecretReset() {
     if (!tgUser) {
         alert("Требуется авторизация!");
@@ -1274,28 +1275,34 @@ function globalSecretReset() {
 
     fetch(webAppUrl, {
         method: 'POST',
-        mode: 'no-cors',
         body: JSON.stringify({
-            action: "CLEAR_ALL",
+            action: "deleteDate",
             date: dateToClear,
             user: tgUser,
             role: userRole,
             password: pass
         })
     })
-    .then(() => {
+    .then(response => response.json())
+    .then(result => {
+        if (!result.success) {
+            alert("Ошибка сброса: " + (result.message || "Неизвестная ошибка"));
+            return;
+        }
+
         localSubmitted[dateToClear] = [];
         localComments[dateToClear] = {};
         renderDebtors();
 
-        alert("Команда отправлена. Проверьте отчёты за выбранную дату.");
+        alert(
+            `Сброс выполнен. Удалено записей: ${result.deleted}. Дата: ${dateToClear}`
+        );
     })
-    .catch(() => {
-        alert("Не удалось отправить команду сброса.");
+    .catch(error => {
+        console.error(error);
+        alert("Не удалось выполнить сброс. Проверьте подключение и адрес Apps Script.");
     });
 }
-
-
         function copyForTelegram() {
             if (!tgUser) { alert("Отчёты скрыты!"); return; }
             
